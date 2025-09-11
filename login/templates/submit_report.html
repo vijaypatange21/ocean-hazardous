@@ -1,0 +1,419 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Report - Ocean Hazard System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .card {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        .form-control, .form-select {
+            border-radius: 8px;
+            border: 1px solid #e0e6ed;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #28a745;
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            border: none;
+        }
+        #location-map {
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="{% url 'reporter_dashboard' %}">
+                <i class="fas fa-waves me-2"></i>Ocean Hazard System
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'reporter_dashboard' %}">
+                            <i class="fas fa-home me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url 'submit_report' %}">
+                            <i class="fas fa-plus-circle me-1"></i>Submit Report
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'my_reports' %}">
+                            <i class="fas fa-list-alt me-1"></i>My Reports
+                        </a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle me-1"></i>{{ user.first_name }} {{ user.last_name }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Profile</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Submit New Hazard Report</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+
+                        <form id="hazard-report-form" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Hazard Type</label>
+                                        <select class="form-select" name="hazard_type" required>
+                                            <option value="">Select hazard type</option>
+                                            <option value="tsunami">Tsunami</option>
+                                            <option value="storm_surge">Storm Surge</option>
+                                            <option value="high_waves">High Waves</option>
+                                            <option value="swell_surge">Swell Surge</option>
+                                            <option value="coastal_flooding">Coastal Flooding</option>
+                                            <option value="unusual_tides">Unusual Tides</option>
+                                            <option value="coastal_erosion">Coastal Erosion</option>
+                                            <option value="other">Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Severity Level</label>
+                                        <select class="form-select" name="severity" required>
+                                            <option value="">Select severity</option>
+                                            <option value="low">Low</option>
+                                            <option value="moderate">Moderate</option>
+                                            <option value="high">High</option>
+                                            <option value="critical">Critical</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Description</label>
+                                <textarea class="form-control" name="description" rows="4" 
+                                          placeholder="Describe the hazard situation in detail..." required></textarea>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Location</label>
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="location-display" 
+                                               placeholder="Click on map to select location or use 'Get My Location'" readonly>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button type="button" class="btn btn-outline-primary w-100" onclick="getCurrentLocation()">
+                                            <i class="fas fa-location-arrow me-1"></i>Get My Location
+                                        </button>
+                                    </div>
+                                </div>
+                                <input type="hidden" name="latitude" id="latitude">
+                                <input type="hidden" name="longitude" id="longitude">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Contact Number (Optional)</label>
+                                <input type="tel" class="form-control" name="contact_number" 
+                                       placeholder="Your contact number">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="urgent" id="urgent">
+                                    <label class="form-check-label text-danger fw-bold" for="urgent">
+                                        <i class="fas fa-exclamation-triangle me-1"></i>Mark as Urgent
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Upload Photos/Videos (Optional)</label>
+                                <input type="file" class="form-control" name="media_files" 
+                                       accept="image/*,video/*" multiple onchange="handleFileSelection()">
+                                <small class="form-text text-muted">You can upload multiple photos and videos (Max 50MB total)</small>
+                            </div>
+                            
+                            <div class="text-end">
+                                <a href="{% url 'reporter_dashboard' %}" class="btn btn-secondary me-2">
+                                    <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane me-1"></i>Submit Report
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <!-- Location Selection Map -->
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0"><i class="fas fa-map-marker-alt me-2"></i>Select Location</h6>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="location-map" style="height: 300px;"></div>
+                    </div>
+                </div>
+                
+                <!-- Quick Guidelines -->
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Quick Tips</h6>
+                    </div>
+                    <div class="card-body">
+                        <ul class="small mb-0">
+                            <li>Be as specific as possible in your description</li>
+                            <li>Include exact time if the incident just occurred</li>
+                            <li>Mark as urgent only for immediate threats to life/property</li>
+                            <li>Upload clear photos/videos if safely available</li>
+                            <li>Provide contact information for follow-up if possible</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Emergency Contact Info -->
+                <div class="card mt-3">
+                    <div class="card-header bg-danger text-white">
+                        <h6 class="mb-0"><i class="fas fa-phone me-2"></i>Emergency Contacts</h6>
+                    </div>
+                    <div class="card-body">
+                        <p class="small mb-2"><strong>Emergency Services:</strong> 112</p>
+                        <p class="small mb-2"><strong>Coast Guard:</strong> 1554</p>
+                        <p class="small mb-0"><strong>INCOIS:</strong> +91-40-23895000</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <script>
+        let locationMap;
+        let currentLocation = { lat: 20.5937, lng: 78.9629 }; // Default: India center
+        let selectedLocation = null;
+
+        // Initialize map when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeGeolocation();
+            setTimeout(initializeLocationMap, 100);
+        });
+
+        function initializeGeolocation() {
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        currentLocation = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+                        if (locationMap) {
+                            locationMap.setView([currentLocation.lat, currentLocation.lng], 10);
+                        }
+                    },
+                    function(error) {
+                        console.log("Geolocation error:", error);
+                    }
+                );
+            }
+        }
+
+        function initializeLocationMap() {
+            if (locationMap) {
+                locationMap.remove();
+            }
+            
+            locationMap = L.map('location-map').setView([currentLocation.lat, currentLocation.lng], 10);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(locationMap);
+            
+            // Add click event to select location
+            locationMap.on('click', function(e) {
+                const lat = e.latlng.lat;
+                const lng = e.latlng.lng;
+                
+                selectedLocation = { lat, lng };
+                updateLocationInputs(lat, lng);
+                updateLocationMarker(lat, lng);
+            });
+        }
+
+        function getCurrentLocation() {
+            if ("geolocation" in navigator) {
+                const button = event.target;
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Getting Location...';
+                button.disabled = true;
+
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        
+                        selectedLocation = { lat, lng };
+                        updateLocationInputs(lat, lng);
+                        
+                        if (locationMap) {
+                            locationMap.setView([lat, lng], 15);
+                            updateLocationMarker(lat, lng);
+                        }
+                        
+                        button.innerHTML = originalText;
+                        button.disabled = false;
+                    },
+                    function(error) {
+                        alert("Unable to get your location. Please select manually on the map.");
+                        button.innerHTML = originalText;
+                        button.disabled = false;
+                    }
+                );
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+
+        function updateLocationInputs(lat, lng) {
+            document.getElementById('latitude').value = lat;
+            document.getElementById('longitude').value = lng;
+            document.getElementById('location-display').value = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
+            
+            // Optional: Reverse geocode to get address
+            reverseGeocode(lat, lng);
+        }
+
+        function updateLocationMarker(lat, lng) {
+            // Remove existing marker
+            locationMap.eachLayer(function(layer) {
+                if (layer instanceof L.Marker) {
+                    locationMap.removeLayer(layer);
+                }
+            });
+            
+            // Add new marker
+            L.marker([lat, lng])
+                .addTo(locationMap)
+                .bindPopup('Selected Location')
+                .openPopup();
+        }
+
+        function reverseGeocode(lat, lng) {
+            // Using OpenStreetMap Nominatim API for reverse geocoding
+            fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.display_name) {
+                        document.getElementById('location-display').value = data.display_name;
+                    }
+                })
+                .catch(error => {
+                    console.log('Reverse geocoding failed:', error);
+                });
+        }
+
+        // File upload handling
+        function handleFileSelection() {
+            const fileInput = document.querySelector('input[name="media_files"]');
+            const files = fileInput.files;
+            
+            if (files.length > 0) {
+                let totalSize = 0;
+                for (let file of files) {
+                    totalSize += file.size;
+                }
+                
+                // Check total size (50MB limit)
+                const maxSize = 50 * 1024 * 1024; // 50MB
+                if (totalSize > maxSize) {
+                    alert('Total file size exceeds 50MB limit. Please select smaller files.');
+                    fileInput.value = '';
+                    return;
+                }
+                
+                // Show selected files count
+                const helpText = fileInput.nextElementSibling;
+                helpText.textContent = `${files.length} file(s) selected (${formatFileSize(totalSize)})`;
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Form submission validation
+        document.getElementById('hazard-report-form').addEventListener('submit', function(e) {
+            // Validate location is selected
+            const lat = document.getElementById('latitude').value;
+            const lng = document.getElementById('longitude').value;
+            
+            if (!lat || !lng) {
+                e.preventDefault();
+                alert('Please select a location on the map or use "Get My Location" button.');
+                return false;
+            }
+            
+            // Add loading state
+            const submitButton = this.querySelector('button[type="submit"]');
+            const originalText = submitButton.innerHTML;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Submitting...';
+            submitButton.disabled = true;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!-- verify_wallet_modal.html -->
+{% load static %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Modal -->
+<div class="modal fade" id="walletModal" tabindex="-1" aria-labelledby="walletModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content shadow-lg rounded-4">
+      <div class="modal-header bg-primary text-white rounded-top-4">
+        <h5 class="modal-title" id="walletModalLabel">Admin Wallet Verification</h5>
+      </div>
+      <div class="modal-body text-center py-5">
+        <p class="mb-4">Please connect your MetaMask wallet to proceed.</p>
+        <button id="connectWallet" class="btn btn-lg btn-gradient" style="background: linear-gradient(90deg, #667eea, #764ba2); color:white;">Connect MetaMask</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    // Show modal automatically
+    const walletModal = new bootstrap.Modal(document.getElementById('walletModal'), {backdrop: 'static', keyboard: false});
+    walletModal.show();
+
+    document.getElementById("connectWallet").addEventListener("click", async () => {
+        if(window.ethereum){
+            try{
+                const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+                const wallet = accounts[0];
+
+                // Send wallet address to backend
+                fetch("{% url 'save_wallet_address' %}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                        "X-CSRFToken": "{{ csrf_token }}"
+                    },
+                    body: "wallet_address=" + wallet
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.status === "success"){
+                        window.location.href = "{% url 'admin_dashboard' %}";
+                    } else {
+                        alert("Failed to save wallet. Try again.");
+                    }
+                });
+            } catch(err){
+                alert("MetaMask connection failed: " + err.message);
+            }
+        } else {
+            alert("MetaMask not detected. Install it first.");
+        }
+    });
+});
+</script>
+
+<style>
+/* Extra styling for God-style modal */
+.modal-content {
+    border: none;
+    overflow: hidden;
+}
+.btn-gradient:hover {
+    opacity: 0.85;
+}
+</style>

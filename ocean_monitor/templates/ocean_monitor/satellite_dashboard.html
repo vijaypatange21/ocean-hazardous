@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INCOIS Satellite Dashboard</title>
+    {% load static %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{% static 'css/satellite_dashboard.css' %}" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-satellite"></i> INCOIS Satellite Dashboard
+            </a>
+            <div class="d-flex">
+                <span class="navbar-text me-3">
+                    <i class="fas fa-user"></i> {{ user.get_full_name|default:user.username }}
+                </span>
+                <a class="btn btn-outline-light btn-sm" href="{% url 'admin_dashboard' %}">
+                    <i class="fas fa-arrow-left"></i> Back to Admin
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <!-- Stats Row -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card bg-primary text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h5>Recent Reports</h5>
+                                <h2>{{ recent_reports }}</h2>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-exclamation-triangle fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-danger text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h5>Critical Reports</h5>
+                                <h2>{{ critical_reports }}</h2>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-fire fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h5>Unverified</h5>
+                                <h2>{{ unverified_reports }}</h2>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-clock fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h5>Total Reports</h5>
+                                <h2>{{ total_reports }}</h2>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-database fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Satellite Map -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5><i class="fas fa-satellite"></i> Live NOAA Coral Reef Watch</h5>
+                        <div class="btn-group">
+                            <button class="btn btn-primary btn-sm" onclick="refreshSatelliteMap()">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                            <button class="btn btn-success btn-sm" onclick="toggleAutoRefresh()" id="autoRefreshBtn">
+                                <i class="fas fa-play" id="autoRefreshIcon"></i> Auto Refresh
+                            </button>
+                            <a href="{% url 'ocean_monitor:satellite_map_full' %}" class="btn btn-info btn-sm" target="_blank">
+                                <i class="fas fa-expand"></i> Full Screen
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="satellite-map-container">
+                            <iframe 
+                                id="satelliteMap" 
+                                src="{% if map_config %}{{ map_config.base_url }}?lat={{ map_config.default_lat }}&lng={{ map_config.default_lng }}&zoom_level={{ map_config.default_zoom }}{% else %}https://coralreefwatch.noaa.gov/product/vs/map_full.html?lat=20.5937&lng=78.9629&zoom_level=5{% endif %}"
+                                width="100%" 
+                                height="600px" 
+                                frameborder="0"
+                                allowfullscreen>
+                            </iframe>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle"></i> 
+                                    Last updated: <span id="lastUpdate">{{ "now"|date:"M d, Y H:i:s" }}</span>
+                                </small>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <small class="text-muted">
+                                    Status: <span id="refreshStatus" class="badge bg-secondary">Manual</span>
+                                </small>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <small class="text-muted">
+                                    Session: {{ session.session_start|date:"H:i" }}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions Row -->
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-bolt"></i> Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'all_reports' %}" class="btn btn-primary">
+                                <i class="fas fa-list"></i> View All Reports
+                            </a>
+                            <a href="{% url 'ocean_monitor:satellite_map_full' %}" class="btn btn-info" target="_blank">
+                                <i class="fas fa-expand"></i> Full Screen Map
+                            </a>
+                            <button class="btn btn-secondary" onclick="exportData()">
+                                <i class="fas fa-download"></i> Export Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-bell"></i> Active Alerts</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if active_alerts %}
+                            {% for alert in active_alerts %}
+                            <div class="alert alert-{{ alert.severity }} alert-dismissible fade show" role="alert">
+                                <strong>{{ alert.get_alert_type_display }}</strong> - {{ alert.title }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-muted">No active alerts at this time.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/satellite_map.js' %}"></script>
+    
+    <script>
+    let autoRefreshInterval;
+    let isAutoRefreshActive = false;
+    const refreshIntervalMs = {% if map_config %}{{ map_config.refresh_interval|default:300 }} * 1000{% else %}300000{% endif %};
+
+    function refreshSatelliteMap() {
+        const iframe = document.getElementById('satelliteMap');
+        const currentSrc = iframe.src;
+        iframe.src = '';
+        setTimeout(() => {
+            iframe.src = currentSrc + '&t=' + new Date().getTime();
+            updateLastUpdateTime();
+        }, 100);
+    }
+
+    function toggleAutoRefresh() {
+        const icon = document.getElementById('autoRefreshIcon');
+        const status = document.getElementById('refreshStatus');
+        const btn = document.getElementById('autoRefreshBtn');
+        
+        if (isAutoRefreshActive) {
+            clearInterval(autoRefreshInterval);
+            icon.className = 'fas fa-play';
+            btn.className = 'btn btn-success btn-sm';
+            status.textContent = 'Manual';
+            status.className = 'badge bg-secondary';
+            isAutoRefreshActive = false;
+        } else {
+            autoRefreshInterval = setInterval(refreshSatelliteMap, refreshIntervalMs);
+            icon.className = 'fas fa-pause';
+            btn.className = 'btn btn-warning btn-sm';
+            status.textContent = 'Auto';
+            status.className = 'badge bg-success';
+            isAutoRefreshActive = true;
+        }
+    }
+
+    function updateLastUpdateTime() {
+        document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
+    }
+
+    function exportData() {
+        alert('Data export functionality will be implemented in Phase 2');
+    }
+
+    // Auto-start refresh
+    window.addEventListener('load', function() {
+        setTimeout(toggleAutoRefresh, 3000);
+    });
+
+    // End session when leaving page
+    window.addEventListener('beforeunload', function() {
+        fetch('{% url "ocean_monitor:end_session" %}', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            }
+        });
+    });
+    </script>
+</body>
+</html>

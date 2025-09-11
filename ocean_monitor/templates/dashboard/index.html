@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ocean Monitor Dashboard - INCOIS</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    
+    <style>
+        :root {
+            --ocean-blue: #006994;
+            --deep-blue: #003f5c;
+            --coral-orange: #ff6b6b;
+            --sea-green: #20b2aa;
+            --wave-cyan: #00bcd4;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            background: var(--ocean-blue) !important;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.95);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+
+        .metric-card {
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-label {
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .status-normal { background-color: var(--sea-green); }
+        .status-warning { background-color: #ffc107; }
+        .status-alert { background-color: var(--coral-orange); }
+
+        .satellite-feed {
+            height: 600px;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .satellite-feed iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .satellite-options {
+            padding: 15px;
+            background: rgba(0,105,148,0.1);
+            border-bottom: 1px solid rgba(0,105,148,0.2);
+        }
+
+        .satellite-options .btn {
+            margin-right: 5px;
+            font-size: 0.875rem;
+            padding: 6px 12px;
+        }
+
+        .feed-overlay {
+            position: absolute;
+            top: 80px;
+            left: 15px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            z-index: 1000;
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .hazard-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .hazard-item {
+            padding: 15px;
+            border-left: 4px solid var(--sea-green);
+            margin-bottom: 10px;
+            background: rgba(255,255,255,0.8);
+            border-radius: 8px;
+        }
+
+        .hazard-high { border-left-color: var(--coral-orange); }
+        .hazard-medium { border-left-color: #ffc107; }
+        .hazard-low { border-left-color: var(--sea-green); }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .refresh-btn {
+            position: absolute;
+            top: 80px;
+            right: 15px;
+            z-index: 1000;
+            background: var(--ocean-blue);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            background: var(--deep-blue);
+            transform: rotate(180deg);
+        }
+
+        .chart-container {
+            height: 300px;
+            padding: 20px;
+        }
+
+        #noaaAlternative {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            margin: 20px;
+        }
+
+        #noaaAlternative .btn-primary {
+            background: var(--ocean-blue);
+            border-color: var(--ocean-blue);
+            padding: 12px 24px;
+            font-weight: bold;
+        }
+
+        #noaaAlternative .btn-primary:hover {
+            background: var(--deep-blue);
+            border-color: var(--deep-blue);
+            transform: translateY(-2px);
+        }
+
+        .feed-info {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-water"></i> Ocean Monitor Dashboard
+            </a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text">
+                    <i class="fas fa-satellite-dish"></i> INCOIS Real-Time Monitoring
+                    <span class="loading-spinner ms-2" id="globalSpinner"></span>
+                </span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <!-- Metrics Row -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card metric-card pulse">
+                    <div class="metric-value text-primary" id="seaTemp">--°C</div>
+                    <div class="metric-label">Sea Surface Temperature</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card metric-card pulse">
+                    <div class="metric-value text-info" id="waveHeight">--m</div>
+                    <div class="metric-label">Wave Height</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card metric-card pulse">
+                    <div class="metric-value text-success" id="windSpeed">--kph</div>
+                    <div class="metric-label">Wind Speed</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card metric-card pulse">
+                    <div class="metric-value text-warning" id="oceanColor">--</div>
+                    <div class="metric-label">Ocean Color Index</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Row -->
+        <div class="row">
+            <!-- Satellite Feed -->
+            <div class="col-lg-8">
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-satellite"></i> Live Satellite Ocean Monitoring
+                        </h5>
+                    </div>
+                    <div class="card-body p-0 position-relative">
+                        <!-- Feed Selection Buttons -->
+                        <div class="satellite-options">
+                            <div class="btn-group" role="group" aria-label="Satellite Feed Options">
+                                <button type="button" class="btn btn-primary active" onclick="switchFeed('windy')">
+                                    <i class="fas fa-wind"></i> Windy Ocean
+                                </button>
+                                <button type="button" class="btn btn-outline-primary" onclick="switchFeed('nullschool')">
+                                    <i class="fas fa-globe"></i> Earth Nullschool
+                                </button>
+                                <button type="button" class="btn btn-outline-primary" onclick="switchFeed('marine')">
+                                    <i class="fas fa-ship"></i> Marine Traffic
+                                </button>
+                                <button type="button" class="btn btn-outline-primary" onclick="switchFeed('noaa')">
+                                    <i class="fas fa-external-link-alt"></i> NOAA (External)
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Refresh Button -->
+                        <button class="refresh-btn" onclick="refreshSatelliteFeed()" title="Refresh Feed">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+
+                        <!-- Live Feed Overlay -->
+                        <div class="feed-overlay">
+                            <div><strong>🔴 Live Feed Active</strong></div>
+                            <div>Last Updated: <span id="lastUpdated">--</span></div>
+                        </div>
+
+                        <!-- Feed Info -->
+                        <div class="feed-info" id="feedInfo">
+                            <span id="currentFeedName">Windy Ocean</span> • Real-time Data
+                        </div>
+
+                        <div class="satellite-feed">
+                            <!-- Main Satellite Feed Iframe -->
+                            <iframe 
+                                id="satelliteFeed"
+                                src="https://embed.windy.com/embed2.html?lat=11.587&lon=78.606&detailLat=11.587&detailLon=78.606&width=800&height=500&zoom=5&level=surface&overlay=sst&product=ecmwf&menu=&message=&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=default&metricTemp=default&radarRange=-1"
+                                title="Live Satellite Ocean Feed"
+                                allowfullscreen>
+                            </iframe>
+
+                            <!-- NOAA Alternative Display -->
+                            <div id="noaaAlternative" class="text-center p-4" style="display: none;">
+                                <i class="fas fa-satellite fa-3x mb-3"></i>
+                                <h5>NOAA Coral Reef Watch</h5>
+                                <p class="mb-4">
+                                    Due to security restrictions, NOAA cannot be embedded directly.<br>
+                                    Click below to open the live satellite feed in a new tab:
+                                </p>
+                                <a href="https://coralreefwatch.noaa.gov/product/vs/map_full.html?lat=11.586964482123603&lng=301.60640686874825&zoom_level=2" 
+                                   target="_blank" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-external-link-alt"></i> Open NOAA Live Feed
+                                </a>
+                                <div class="mt-3">
+                                    <small>
+                                        <i class="fas fa-info-circle"></i> 
+                                        This will open the original NOAA Coral Reef Watch satellite data in a new tab
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Temperature Chart -->
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h6 class="mb-0"><i class="fas fa-chart-line"></i> Sea Surface Temperature Trend</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="temperatureChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hazard Alerts & Status -->
+            <div class="col-lg-4">
+                <!-- Ocean Status -->
+                <div class="card mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h6 class="mb-0"><i class="fas fa-shield-alt"></i> Ocean Status</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <span class="status-indicator status-normal"></span>
+                            <strong>Overall Status: NORMAL</strong>
+                        </div>
+                        <div class="mb-2">
+                            <small class="text-muted">Last System Check: <span id="systemCheck">--</span></small>
+                        </div>
+                        <div class="progress mb-2">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: 85%">
+                                System Health: 85%
+                            </div>
+                        </div>
+                        <div class="row text-center">
+                            <div class="col">
+                                <div class="h6 mb-0" id="activeAlerts">0</div>
+                                <small class="text-muted">Active Alerts</small>
+                            </div>
+                            <div class="col">
+                                <div class="h6 mb-0" id="monitoringStations">24</div>
+                                <small class="text-muted">Monitoring Stations</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Hazard Alerts -->
+                <div class="card">
+                    <div class="card-header bg-warning text-dark">
+                        <h6 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Recent Hazard Alerts</h6>
+                        <small>Auto-refreshing every 30 seconds</small>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="hazard-list" id="hazardList">
+                            <div class="text-center p-4">
+                                <div class="loading-spinner"></div>
+                                <div class="mt-2">Loading hazard data...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Global variables
+        let temperatureChart;
+        let refreshInterval;
+        let currentFeed = 'windy';
+        
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            startAutoRefresh();
+            updateTimestamp();
+        });
+
+        // Initialize temperature chart
+        function initializeCharts() {
+            const ctx = document.getElementById('temperatureChart').getContext('2d');
+            temperatureChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Sea Surface Temperature (°C)',
+                        data: [],
+                        borderColor: 'rgb(54, 162, 235)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 20,
+                            max: 35
+                        }
+                    }
+                }
+            });
+        }
+
+        // Switch between different satellite feeds
+        function switchFeed(feedType) {
+            const iframe = document.getElementById('satelliteFeed');
+            const noaaAlternative = document.getElementById('noaaAlternative');
+            const buttons = document.querySelectorAll('.satellite-options .btn');
+            const feedInfo = document.getElementById('feedInfo');
+            const currentFeedName = document.getElementById('currentFeedName');
+            
+            // Remove active class from all buttons
+            buttons.forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.add('btn-outline-primary');
+                btn.classList.remove('btn-primary');
+            });
+            
+            let feedUrl = '';
+            let showIframe = true;
+            let feedName = '';
+            
+            switch(feedType) {
+                case 'windy':
+                    feedUrl = 'https://embed.windy.com/embed2.html?lat=11.587&lon=78.606&detailLat=11.587&detailLon=78.606&width=800&height=500&zoom=5&level=surface&overlay=sst&product=ecmwf&menu=&message=&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=default&metricTemp=default&radarRange=-1';
+                    feedName = 'Windy Ocean';
+                    break;
+                case 'nullschool':
+                    feedUrl = 'https://earth.nullschool.net/#current/ocean/surface/currents/orthographic=-278.59,11.59,1024/loc=78.606,11.587';
+                    feedName = 'Earth Nullschool';
+                    break;
+                case 'marine':
+                    feedUrl = 'https://www.marinetraffic.com/en/ais/embed/zoom:10/centery:1158/centerx:7860/maptype:4/shownames:false/mmsi:0/shipid:0/fleet:false/fleet_id:/vtypes:/showmenu:/remember:false';
+                    feedName = 'Marine Traffic';
+                    break;
+                case 'noaa':
+                    showIframe = false;
+                    feedName = 'NOAA External';
+                    break;
+            }
+            
+            if (showIframe) {
+                iframe.style.display = 'block';
+                noaaAlternative.style.display = 'none';
+                iframe.src = feedUrl;
+                currentFeedName.textContent = feedName;
+                
+                // Update active button
+                event.target.classList.add('active');
+                event.target.classList.add('btn-primary');
+                event.target.classList.remove('btn-outline-primary');
+            } else {
+                iframe.style.display = 'none';
+                noaaAlternative.style.display = 'block';
+                currentFeedName.textContent = feedName;
+                
+                // Update active button for NOAA
+                event.target.classList.add('active');
+                event.target.classList.add('btn-primary');
+                event.target.classList.remove('btn-outline-primary');
+            }
+            
+            currentFeed = feedType;
+            updateTimestamp();
+        }
+
+        // Fetch satellite data
+        async function fetchSatelliteData() {
+            try {
+                const response = await fetch('/api/satellite-data/');
+                const data = await response.json();
+                
+                // Update metrics
+                document.getElementById('seaTemp').textContent = data.sea_surface_temperature + '°C';
+                document.getElementById('waveHeight').textContent = data.wave_height + 'm';
+                document.getElementById('windSpeed').textContent = data.wind_speed + ' kph';
+                document.getElementById('oceanColor').textContent = data.ocean_color_index;
+                
+                // Update chart
+                updateTemperatureChart(data.sea_surface_temperature);
+                
+                updateTimestamp();
+                
+            } catch (error) {
+                console.error('Error fetching satellite data:', error);
+                // Use mock data if API fails
+                const mockTemp = (25 + Math.random() * 5).toFixed(1);
+                document.getElementById('seaTemp').textContent = mockTemp + '°C';
+                document.getElementById('waveHeight').textContent = (1 + Math.random() * 2).toFixed(1) + 'm';
+                document.getElementById('windSpeed').textContent = (10 + Math.random() * 15).toFixed(0) + ' kph';
+                document.getElementById('oceanColor').textContent = (Math.random()).toFixed(2);
+                updateTemperatureChart(parseFloat(mockTemp));
+            }
+        }
+
+        // Fetch hazard data
+        async function fetchHazardData() {
+            try {
+                const response = await fetch('/api/ocean-hazards/');
+                const data = await response.json();
+                
+                updateHazardList(data.hazards);
+                document.getElementById('activeAlerts').textContent = data.hazards.length;
+                
+            } catch (error) {
+                console.error('Error fetching hazard data:', error);
+                // Show mock data if API fails
+                const mockHazards = [
+                    {
+                        id: 1,
+                        type: 'high_waves',
+                        severity: 'medium',
+                        location: 'Bay of Bengal',
+                        description: 'Moderate wave conditions detected',
+                        timestamp: new Date().toISOString()
+                    }
+                ];
+                updateHazardList(mockHazards);
+                document.getElementById('activeAlerts').textContent = mockHazards.length;
+            }
+        }
+
+        // Update temperature chart
+        function updateTemperatureChart(temperature) {
+            const now = new Date().toLocaleTimeString();
+            
+            if (temperatureChart.data.labels.length >= 10) {
+                temperatureChart.data.labels.shift();
+                temperatureChart.data.datasets[0].data.shift();
+            }
+            
+            temperatureChart.data.labels.push(now);
+            temperatureChart.data.datasets[0].data.push(temperature);
+            temperatureChart.update();
+        }
+
+        // Update hazard list
+        function updateHazardList(hazards) {
+            const hazardList = document.getElementById('hazardList');
+            
+            if (hazards.length === 0) {
+                hazardList.innerHTML = `
+                    <div class="text-center p-4 text-success">
+                        <i class="fas fa-check-circle fa-2x mb-2"></i>
+                        <div>No active hazard alerts</div>
+                        <small class="text-muted">All systems normal</small>
+                    </div>
+                `;
+                return;
+            }
+            
+            hazardList.innerHTML = hazards.map(hazard => `
+                <div class="hazard-item hazard-${hazard.severity}">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="mb-1">
+                                <i class="fas fa-${getHazardIcon(hazard.type)}"></i>
+                                ${formatHazardType(hazard.type)}
+                            </h6>
+                            <p class="mb-1 small">${hazard.description}</p>
+                            <small class="text-muted">
+                                <i class="fas fa-map-marker-alt"></i> ${hazard.location}
+                                <br>
+                                <i class="fas fa-clock"></i> ${formatTime(hazard.timestamp)}
+                            </small>
+                        </div>
+                        <span class="badge bg-${getSeverityColor(hazard.severity)}">${hazard.severity.toUpperCase()}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Helper functions
+        function getHazardIcon(type) {
+            const icons = {
+                'tsunami': 'water',
+                'high_waves': 'wave-square',
+                'storm_surge': 'wind',
+                'coastal_current': 'arrows-alt'
+            };
+            return icons[type] || 'exclamation-triangle';
+        }
+
+        function formatHazardType(type) {
+            return type.split('_').map(word => 
+                word.charAt(0).toUpperCase() + word.slice(1)
+            ).join(' ');
+        }
+
+        function getSeverityColor(severity) {
+            const colors = {
+                'low': 'success',
+                'medium': 'warning',
+                'high': 'danger',
+                'critical': 'dark'
+            };
+            return colors[severity] || 'secondary';
+        }
+
+        function formatTime(timestamp) {
+            return new Date(timestamp).toLocaleString();
+        }
+
+        function updateTimestamp() {
+            const now = new Date();
+            document.getElementById('lastUpdated').textContent = now.toLocaleTimeString();
+            document.getElementById('systemCheck').textContent = now.toLocaleString();
+        }
+
+        // Refresh satellite feed
+        function refreshSatelliteFeed() {
+            const iframe = document.getElementById('satelliteFeed');
+            const currentSrc = iframe.src;
+            
+            if (iframe.style.display !== 'none' && currentSrc) {
+                iframe.src = '';
+                
+                // Add a small delay to ensure the iframe reloads
+                setTimeout(() => {
+                    iframe.src = currentSrc;
+                    updateTimestamp();
+                }, 100);
+            }
+            
+            // Rotate the refresh button
+            event.target.style.transform = 'rotate(360deg)';
+            setTimeout(() => {
+                event.target.style.transform = '';
+            }, 600);
+        }
+
+        // Auto-refresh functionality
+        function startAutoRefresh() {
+            // Initial load
+            fetchSatelliteData();
+            fetchHazardData();
+            
+            // Set up intervals
+            setInterval(() => {
+                fetchSatelliteData();
+                fetchHazardData();
+            }, 30000); // Refresh every 30 seconds
+            
+            // Auto-refresh satellite feed every 5 minutes
+            setInterval(() => {
+                if (currentFeed !== 'noaa') {
+                    refreshSatelliteFeed();
+                }
+            }, 300000);
+        }
+
+        // Add some interactivity
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.metric-card')) {
+                e.target.closest('.metric-card').classList.add('pulse');
+                setTimeout(() => {
+                    e.target.closest('.metric-card').classList.remove('pulse');
+                }, 1000);
+            }
+        });
+
+        // Handle network errors gracefully
+        window.addEventListener('online', function() {
+            console.log('Connection restored');
+            fetchSatelliteData();
+            fetchHazardData();
+        });
+
+        window.addEventListener('offline', function() {
+            console.log('Connection lost');
+        });
+    </script>
+</body>
+</html>

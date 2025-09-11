@@ -1,0 +1,346 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporter Dashboard - Ocean Hazard System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Leaflet CSS for Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-gradient-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="#">
+                <i class="fas fa-waves me-2"></i>Ocean Hazard System
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" onclick="showDashboard()">
+                            <i class="fas fa-home me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-clipboard-list me-1"></i>Reports
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" onclick="showSubmitReport()">
+                                <i class="fas fa-plus-circle me-2"></i>Submit New Report
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'my_reports' %}">
+                                <i class="fas fa-list-alt me-2"></i>My Reports
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'all_reports' %}">
+                                <i class="fas fa-eye me-2"></i>View All Reports
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" onclick="showGuidelines()">
+                                <i class="fas fa-book me-2"></i>Reporting Guidelines
+                            </a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                   <a class="nav-link" href="{% url 'reporter_dashboard_map' %}">
+                        <i class="fas fa-map-marked-alt me-1"></i> Map View
+                    </a>
+
+                    </li>
+                </ul>
+                
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle me-1"></i>{{ user.first_name }} {{ user.last_name }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Profile</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <div class="container-fluid mt-4">
+        <!-- Dashboard Content -->
+        <div id="dashboard-content">
+            <!-- Welcome Card -->
+            <div class="welcome-card mb-4">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h2><i class="fas fa-edit me-2"></i>Welcome back, {{ user.first_name }}!</h2>
+                        <p class="mb-0">You're logged in as a <strong>Reporter</strong>. Submit new reports and manage your ocean hazard observations.</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <i class="fas fa-user-edit" style="font-size: 4rem; opacity: 0.3;"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Cards -->
+            <div class="row">
+                <div class="col-lg-6 col-md-6">
+                    <div class="dashboard-card text-center" onclick="showSubmitReport()">
+                        <i class="fas fa-plus-circle card-icon"></i>
+                        <h5>Submit New Report</h5>
+                        <p class="text-muted">Report new ocean hazard incidents and observations quickly and efficiently.</p>
+                        <div class="stats-number">{{ this_month_reports }}</div>
+                        <small class="text-muted">Reports This Month</small>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6">
+                    <div class="dashboard-card text-center" onclick="window.location.href='{% url 'my_reports' %}'">
+                        <i class="fas fa-list-alt card-icon"></i>
+                        <h5>My Reports</h5>
+                        <p class="text-muted">View and manage all your submitted reports and their current status.</p>
+                        <div class="stats-number">{{ total_reports }}</div>
+                        <small class="text-muted">Total Reports</small>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6">
+                    <div class="dashboard-card text-center" onclick="showMap()">
+                        <i class="fas fa-map-marked-alt card-icon"></i>
+                        <h5>Interactive Map</h5>
+                        <p class="text-muted">View hazard reports on an interactive map with real-time data.</p>
+                        <div class="stats-number">{{ approval_rate }}%</div>
+                        <small class="text-muted">Approval Rate</small>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6">
+                    <div class="dashboard-card text-center" onclick="showGuidelines()">
+                        <i class="fas fa-book card-icon"></i>
+                        <h5>Reporting Guidelines</h5>
+                        <p class="text-muted">Access reporting standards and best practices for accurate documentation.</p>
+                        <div class="stats-number">24/7</div>
+                        <small class="text-muted">Support Available</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit Report Content (Hidden by default) -->
+        <div id="submit-report-content" class="d-none">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Submit New Hazard Report</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="hazard-report-form" method="post" action="{% url 'submit_report' %}" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Hazard Type</label>
+                                            <select class="form-select" name="hazard_type" required>
+                                                <option value="">Select hazard type</option>
+                                                <option value="tsunami">Tsunami</option>
+                                                <option value="storm_surge">Storm Surge</option>
+                                                <option value="high_waves">High Waves</option>
+                                                <option value="swell_surge">Swell Surge</option>
+                                                <option value="coastal_flooding">Coastal Flooding</option>
+                                                <option value="unusual_tides">Unusual Tides</option>
+                                                <option value="coastal_erosion">Coastal Erosion</option>
+                                                <option value="other">Other</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Severity Level</label>
+                                            <select class="form-select" name="severity" required>
+                                                <option value="">Select severity</option>
+                                                <option value="low">Low</option>
+                                                <option value="moderate">Moderate</option>
+                                                <option value="high">High</option>
+                                                <option value="critical">Critical</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Description</label>
+                                    <textarea class="form-control" name="description" rows="4" 
+                                              placeholder="Describe the hazard situation in detail..." required></textarea>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Location</label>
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <input type="text" class="form-control" id="location-display" 
+                                                   placeholder="Click on map to select location" readonly>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <button type="button" class="btn btn-outline-primary" onclick="getCurrentLocation()">
+                                                <i class="fas fa-location-arrow me-1"></i>Use My Location
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="latitude" id="latitude">
+                                    <input type="hidden" name="longitude" id="longitude">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Contact Number (Optional)</label>
+                                    <input type="tel" class="form-control" name="contact_number" 
+                                           placeholder="Your contact number">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="urgent" id="urgent">
+                                        <label class="form-check-label text-danger" for="urgent">
+                                            <i class="fas fa-exclamation-triangle me-1"></i>Mark as Urgent
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Upload Photos/Videos (Optional)</label>
+                                    <input type="file" class="form-control" name="media_files" 
+                                           accept="image/*,video/*" multiple>
+                                    <small class="form-text text-muted">You can upload multiple photos and videos</small>
+                                </div>
+                                
+                                <div class="text-end">
+                                    <button type="button" class="btn btn-secondary me-2" onclick="showDashboard()">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-paper-plane me-1"></i>Submit Report
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4">
+                    <!-- Location Selection Map -->
+                    <div class="card shadow-sm">
+                        <div class="card-header">
+                            <h6 class="mb-0"><i class="fas fa-map-marker-alt me-2"></i>Select Location</h6>
+                        </div>
+                        <div class="card-body p-0">
+                            <div id="location-map" style="height: 300px;"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Guidelines -->
+                    <div class="card shadow-sm mt-3">
+                        <div class="card-header">
+                            <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Quick Tips</h6>
+                        </div>
+                        <div class="card-body">
+                            <ul class="small mb-0">
+                                <li>Be as specific as possible in your description</li>
+                                <li>Include exact time if possible</li>
+                                <li>Mark urgent only for immediate threats</li>
+                                <li>Upload clear photos/videos if available</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Map Content (Hidden by default) -->
+        <div id="map-content" class="d-none">
+            <div class="card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-map-marked-alt me-2"></i>Hazard Reports Map</h5>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="refreshMapData()">
+                            <i class="fas fa-sync-alt me-1"></i>Refresh
+                        </button>
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="toggleMapView()">
+                            <i class="fas fa-layer-group me-1"></i>Toggle View
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div id="main-map" style="height: 600px;"></div>
+                </div>
+                <div class="card-footer">
+                    <div class="row text-center">
+                        <div class="col-3">
+                            <span class="badge bg-success">●</span> Verified
+                        </div>
+                        <div class="col-3">
+                            <span class="badge bg-warning">●</span> Pending
+                        </div>
+                        <div class="col-3">
+                            <span class="badge bg-danger">●</span> Critical
+                        </div>
+                        <div class="col-3">
+                            <span class="badge bg-info">●</span> Investigating
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Guidelines Content (Hidden by default) -->
+        <div id="guidelines-content" class="d-none">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-book me-2"></i>Reporting Guidelines</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <h6>What to Report:</h6>
+                            <ul>
+                                <li><strong>Tsunami:</strong> Unusual sea behavior, rapid water level changes</li>
+                                <li><strong>Storm Surge:</strong> Abnormal water levels during storms</li>
+                                <li><strong>High Waves:</strong> Exceptionally large waves affecting coastline</li>
+                                <li><strong>Swell Surge:</strong> Long-period waves from distant storms</li>
+                                <li><strong>Coastal Flooding:</strong> Water inundation in coastal areas</li>
+                                <li><strong>Unusual Tides:</strong> Extreme high/low tides beyond normal</li>
+                            </ul>
+                        </div>
+                        <div class="col-lg-6">
+                            <h6>Reporting Best Practices:</h6>
+                            <ul>
+                                <li>Report incidents as soon as safely possible</li>
+                                <li>Include specific time and location details</li>
+                                <li>Describe what you observed clearly</li>
+                                <li>Include photos/videos if available</li>
+                                <li>Mark as urgent only for immediate threats</li>
+                                <li>Provide contact information for follow-up</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Remember:</strong> Your reports help save lives and protect coastal communities. 
+                        Accurate and timely reporting is crucial for effective hazard management.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="{% static 'js/dashboard.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,159 @@
+{% extends 'login/base.html' %}
+{% load static %}
+
+{% block title %}Register - Ocean Hazard System{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px 0;
+    }
+    .register-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+    }
+    .register-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        width: 100%;
+        max-width: 500px;
+    }
+    #connect-wallet-btn {
+        display: none;
+        width: 100%;
+        margin-bottom: 15px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="register-container">
+    <div class="video_bg is--hero w-background-video w-background-video-atom">
+        <video autoplay loop muted playsinline data-wf-ignore="true" data-object-fit="cover" class="video-background">
+            <source src="{% static 'media/ocean-bg.mp4' %}" type="video/mp4">
+        </video>
+    </div>
+    <div class="register-card">
+        <h2 class="text-center mb-4">Register for Ocean Hazard System</h2>
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                            <li>{{ field|title }}: {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <form method="post" id="register-form">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.first_name.id_for_label }}" class="form-label">First Name</label>
+                    {{ form.first_name }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.last_name.id_for_label }}" class="form-label">Last Name</label>
+                    {{ form.last_name }}
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="{{ form.username.id_for_label }}" class="form-label">Username</label>
+                {{ form.username }}
+            </div>
+            <div class="mb-3">
+                <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                {{ form.email }}
+            </div>
+            <div class="mb-3">
+                <label for="{{ form.user_type.id_for_label }}" class="form-label">User Type</label>
+                {{ form.user_type }}
+            </div>
+
+            <!-- MetaMask connect button -->
+            <button type="button" id="connect-wallet-btn" class="btn btn-warning">Connect MetaMask Wallet</button>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.phone_number.id_for_label }}" class="form-label">Phone Number</label>
+                    {{ form.phone_number }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.department.id_for_label }}" class="form-label">Department</label>
+                    {{ form.department }}
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="{{ form.password1.id_for_label }}" class="form-label">Password</label>
+                {{ form.password1 }}
+            </div>
+            <div class="mb-3">
+                <label for="{{ form.password2.id_for_label }}" class="form-label">Confirm Password</label>
+                {{ form.password2 }}
+            </div>
+
+            <!-- Hidden wallet address field -->
+            {{ form.wallet_address }}
+
+            <button type="submit" class="btn btn-primary w-100">Register</button>
+        </form>
+        
+        <div class="text-center mt-3">
+            <p><a href="{% url 'login' %}" class="text-decoration-none">Already have an account? Login here</a></p>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+<script>
+    const userTypeField = document.getElementById("id_user_type");
+    const connectWalletBtn = document.getElementById("connect-wallet-btn");
+    const walletInput = document.getElementById("id_wallet_address");
+
+    function toggleWalletButton() {
+        if (userTypeField.value === "admin") {
+            connectWalletBtn.style.display = "block";
+        } else {
+            connectWalletBtn.style.display = "none";
+            walletInput.value = "";
+        }
+    }
+
+    userTypeField.addEventListener("change", toggleWalletButton);
+    toggleWalletButton();  // Initial check
+
+    connectWalletBtn.addEventListener("click", async () => {
+        if (typeof window.ethereum !== "undefined") {
+            try {
+                const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+                walletInput.value = accounts[0];
+                alert("Wallet connected: " + accounts[0]);
+            } catch (err) {
+                console.error(err);
+                alert("Wallet connection failed.");
+            }
+        } else {
+            alert("MetaMask is not installed. Please install it first.");
+        }
+    });
+</script>
+{% endblock %}

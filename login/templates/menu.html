@@ -1,0 +1,236 @@
+{%load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu - CoastSense</title>
+    <link href="{% static 'css/alora-style.css' %}" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        .menu-page {
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a1a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .menu-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            width: 60%;
+            margin: auto;
+        }
+        
+        .menu-title {
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: 3rem;
+            background: linear-gradient(45deg, #1dcdfe, #34f5c5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .menu-options {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 2rem;
+            flex-wrap: nowrap;
+        }
+        
+        .menu-option {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            text-decoration: none;
+            color: white;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .menu-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(29,205,254,0.1), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .menu-option:hover::before {
+            left: 100%;
+        }
+        
+        .menu-option:hover {
+            transform: translateY(-10px) scale(1.05);
+            border-color: rgba(29,205,254,0.5);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3), 0 0 30px rgba(29,205,254,0.2);
+        }
+        
+        .option-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        
+        .option-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        .option-description {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            line-height: 1.5;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .close-btn:hover {
+            background: rgba(255,255,255,0.2);
+            transform: rotate(90deg);
+        }
+        
+        .menu-links {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            width: 100%;
+        }
+        
+        .menu-link {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin: 0 auto 0 0;
+            padding: 15px 0;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+        .link-line {
+            background: linear-gradient(to bottom, #1dcdfe, #34f5c5);
+            width: 100px;
+            height: 1px;
+            margin: 0 20px 0 0;
+        }
+        
+        .menu-text {
+            background: linear-gradient(to bottom, #1dcdfe, #34f5c5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin: 0 auto 0 0;
+            padding-right: 20px;
+            font-size: 4em;
+            font-weight: 500;
+            line-height: 1;
+            transition: all 0.3s ease;
+        }
+        
+        .menu-link:hover .menu-text {
+            color: #f4bd03;
+            -webkit-text-fill-color: #f4bd03;
+            transform: translateX(10px);
+        }
+        
+        .menu-link:hover .link-line {
+            width: 150px;
+            background: linear-gradient(to right, #f4bd03, #ff6b35);
+        }
+        
+        @media (max-width: 768px) {
+            .menu-options {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                padding: 0 1rem;
+                gap: 1rem;
+            }
+            
+            .menu-option {
+                min-width: 200px;
+                flex-shrink: 0;
+                padding: 2rem 1rem;
+            }
+            
+            .menu-title {
+                font-size: 2.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .menu-option {
+                min-width: 150px;
+                padding: 1.5rem 0.8rem;
+            }
+            
+            .option-icon {
+                font-size: 2rem;
+            }
+            
+            .option-title {
+                font-size: 1.2rem;
+            }
+            
+            .option-description {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+    <script src="{% static 'js/page-transition.js' %}"></script>
+</head>
+<body>
+    <div class="menu-page">
+        <a href="{% url 'home' %}" class="close-btn">×</a>
+
+        <div class="menu-container">
+            <div class="menu-links">
+                <a href="about.html" class="menu-link">
+                    <span class="link-line"></span>
+                    <span class="menu-text">About Us</span>
+                </a>
+                <a href="contact.html" class="menu-link">
+                    <span class="link-line"></span>
+                    <span class="menu-text">Contact Us</span>
+                </a>
+                <a href="operations.html" class="menu-link">
+                    <span class="link-line"></span>
+                    <span class="menu-text">Operations</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

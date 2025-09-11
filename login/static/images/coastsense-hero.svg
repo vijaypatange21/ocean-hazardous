@@ -1,0 +1,16 @@
+<svg width="800" height="200" viewBox="0 0 800 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="oceanGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#1dcdfe;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#34f5c5;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <text x="400" y="120" font-family="Montserrat, sans-serif" font-size="80" font-weight="900" text-anchor="middle" fill="url(#oceanGradient)" letter-spacing="8px">
+    CoastSense
+  </text>
+  
+  <!-- Wave decoration -->
+  <path d="M0,150 Q200,130 400,150 T800,150 L800,200 L0,200 Z" fill="url(#oceanGradient)" opacity="0.3"/>
+  <path d="M0,160 Q150,140 300,160 T600,160 T800,160 L800,200 L0,200 Z" fill="url(#oceanGradient)" opacity="0.2"/>
+</svg>

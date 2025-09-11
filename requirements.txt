@@ -1,0 +1,12 @@
+folium
+pandas
+requests
+Django
+dj-database-url
+whitenoise
+psycopg2-binary
+gunicorn
+python-decouple
+praw
+python-dotenv
+django-cors-headers

@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<!-- Copyright (c) 2025 CoastSense Project -->
+<!-- Licensed under MIT License -->
+<!-- See LICENSE file for details -->
+<html lang="en" data-wf-page="coastsense-operations" data-wf-site="coastsense">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operations - CoastSense</title>
+    <link href="../static/css/alora-style.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        .operations-hero {
+            background: linear-gradient(135deg, rgba(29,205,254,0.1), rgba(52,245,197,0.1));
+            padding: 100px 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .operations-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('../static/images/ocean3.png') center/cover;
+            opacity: 0.1;
+            z-index: -1;
+        }
+
+        .process-section {
+            max-width: 1200px;
+            margin: 4rem auto;
+            padding: 0 2rem;
+        }
+
+        .process-step {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 2rem 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 1px solid rgba(29,205,254,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .process-step::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(to bottom, #1dcdfe, #34f5c5);
+        }
+
+        .step-number {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #1dcdfe, #34f5c5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            box-shadow: 0 5px 15px rgba(29,205,254,0.3);
+        }
+
+        .step-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .step-title {
+            color: #2c3e50;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .step-description {
+            color: #666;
+            line-height: 1.7;
+            font-size: 1.1rem;
+        }
+
+        .tech-stack {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 4rem 0;
+        }
+
+        .tech-card {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border: 1px solid rgba(29,205,254,0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .tech-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .tech-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .tech-title {
+            color: #2c3e50;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .tech-description {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .data-flow {
+            background: linear-gradient(135deg, #1dcdfe 0%, #34f5c5 100%);
+            color: white;
+            padding: 4rem 0;
+            text-align: center;
+            margin: 4rem 0;
+        }
+
+        .flow-diagram {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .flow-item {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            min-width: 200px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .flow-arrow {
+            font-size: 2rem;
+            color: white;
+            margin: 0 1rem;
+        }
+
+        .monitoring-section {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 4rem auto;
+            max-width: 1200px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .monitoring-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .monitoring-item {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, rgba(29,205,254,0.1), rgba(52,245,197,0.1));
+            border-radius: 15px;
+            border: 1px solid rgba(29,205,254,0.2);
+        }
+
+        .monitoring-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .monitoring-title {
+            color: #2c3e50;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .monitoring-description {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .response-section {
+            max-width: 1000px;
+            margin: 4rem auto;
+            text-align: center;
+        }
+
+        .response-timeline {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .response-item {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border: 1px solid rgba(29,205,254,0.2);
+        }
+
+        .response-time {
+            color: #1dcdfe;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .response-action {
+            color: #2c3e50;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .response-description {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .flow-diagram {
+                flex-direction: column;
+            }
+
+            .flow-arrow {
+                transform: rotate(90deg);
+                margin: 1rem 0;
+            }
+        }
+    </style>
+</head>
+
+<body class="body" style="position: relative; min-height: 100vh; overflow-x: hidden;">
+    <video autoplay="" loop="" muted="" playsinline="" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2;">
+        <source src="../static/media/waves.mp4">
+    </video>
+    <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(44,62,80,0.8), rgba(52,73,94,0.8)); z-index: -1;"></div>
+
+    <!-- Navigation -->
+    <nav class="horizontal-nav">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="../static/images/coastsense-logo.svg" alt="CoastSense" width="120">
+            </div>
+            <div class="nav-links">
+                <a href="home.html" class="nav-link">Home</a>
+                <a href="dashboard.html" class="nav-link">Dashboard</a>
+                <a href="report.html" class="nav-link">Report Hazard</a>
+                <a href="#" class="nav-link login-btn">Login</a>
+                <a href="menu.html" class="menu-toggle">
+                    <div class="hamburger">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="operations-hero" style="position: relative; z-index: 1;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
+            <h1 style="font-size: 3.5rem; font-weight: 700; margin-bottom: 1rem; background: linear-gradient(135deg, #1dcdfe, #34f5c5); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">How We Operate</h1>
+            <p style="font-size: 1.3rem; color: rgba(255,255,255,0.9); max-width: 600px; margin: 0 auto; line-height: 1.6;">
+                Advanced technology and coordinated response systems working together to protect coastal communities
+            </p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div style="position: relative; z-index: 1; padding: 4rem 2rem; max-width: 1200px; margin: 0 auto;">
+
+        <!-- Process Overview -->
+        <div style="text-align: center; margin-bottom: 4rem;">
+            <h2 style="color: #2c3e50; font-size: 2.5rem; margin-bottom: 1rem;">Our Operational Framework</h2>
+            <p style="color: #666; font-size: 1.2rem; max-width: 600px; margin: 0 auto; line-height: 1.6;">
+                CoastSense operates through a comprehensive system that combines technology, human intelligence, and emergency response coordination.
+            </p>
+        </div>
+
+        <!-- Process Steps -->
+        <div class="process-section">
+            <div class="process-step">
+                <div class="step-number">1</div>
+                <span class="step-icon">📊</span>
+                <h3 class="step-title">Data Collection & Monitoring</h3>
+                <div class="step-description">
+                    Our system continuously collects data from multiple sources including satellite imagery, coastal sensors, weather stations, and citizen reports. Advanced algorithms process this data in real-time to identify potential hazards and unusual patterns.
+                </div>
+            </div>
+
+            <div class="process-step">
+                <div class="step-number">2</div>
+                <span class="step-icon">🤖</span>
+                <h3 class="step-title">AI-Powered Analysis</h3>
+                <div class="step-description">
+                    Machine learning models analyze the collected data to predict potential coastal hazards. The system considers multiple factors including wave patterns, tidal movements, weather conditions, and historical data to generate risk assessments and early warnings.
+                </div>
+            </div>
+
+            <div class="process-step">
+                <div class="step-number">3</div>
+                <span class="step-icon">🚨</span>
+                <h3 class="step-title">Alert Generation & Distribution</h3>
+                <div class="step-description">
+                    When hazards are detected, the system automatically generates alerts with appropriate severity levels. These alerts are distributed through multiple channels including SMS, mobile apps, email, and integration with existing emergency response systems.
+                </div>
+            </div>
+
+            <div class="process-step">
+                <div class="step-number">4</div>
+                <span class="step-icon">👥</span>
+                <h3 class="step-title">Community Engagement</h3>
+                <div class="step-description">
+                    We actively engage with coastal communities through our citizen science platform. Local residents can report observations, verify alerts, and contribute to the collective understanding of coastal conditions in their areas.
+                </div>
+            </div>
+
+            <div class="process-step">
+                <div class="step-number">5</div>
+                <span class="step-icon">🔄</span>
+                <h3 class="step-title">Continuous Learning & Improvement</h3>
+                <div class="step-description">
+                    Every incident and response is analyzed to improve our prediction models and response procedures. The system learns from both successful interventions and near-misses to enhance future hazard detection and management.
+                </div>
+            </div>
+        </div>
+
+        <!-- Technology Stack -->
+        <div style="text-align: center; margin: 4rem 0;">
+            <h2 style="color: #2c3e50; font-size: 2.5rem; margin-bottom: 1rem;">Technology Stack</h2>
+            <p style="color: #666; font-size: 1.2rem; max-width: 600px; margin: 0 auto 3rem; line-height: 1.6;">
+                Cutting-edge technologies power our coastal monitoring and response systems
+            </p>
+        </div>
+
+        <div class="tech-stack">
+            <div class="tech-card">
+                <span class="tech-icon">🛰️</span>
+                <h3 class="tech-title">Satellite Monitoring</h3>
+                <div class="tech-description">
+                    Real-time satellite imagery and ocean sensors provide continuous monitoring of sea surface temperatures, wave heights, and coastal erosion patterns.
+                </div>
+            </div>
+
+            <div class="tech-card">
+                <span class="tech-icon">🤖</span>
+                <h3 class="tech-title">Machine Learning</h3>
+                <div class="tech-description">
+                    Advanced AI algorithms analyze patterns and predict hazards using historical data, weather patterns, and real-time sensor readings.
+                </div>
+            </div>
+
+            <div class="tech-card">
+                <span class="tech-icon">📱</span>
+                <h3 class="tech-title">Mobile Technology</h3>
+                <div class="tech-description">
+                    Cross-platform mobile applications enable citizen reporting, real-time alerts, and community coordination during emergencies.
+                </div>
+            </div>
+
+            <div class="tech-card">
+                <span class="tech-icon">☁️</span>
+                <h3 class="tech-title">Cloud Infrastructure</h3>
+                <div class="tech-description">
+                    Scalable cloud systems ensure 24/7 availability, data redundancy, and rapid processing of large volumes of environmental data.
+                </div>
+            </div>
+
+            <div class="tech-card">
+                <span class="tech-icon">📡</span>
+                <h3 class="tech-title">IoT Sensors</h3>
+                <div class="tech-description">
+                    Network of coastal sensors measures wave heights, water levels, and environmental conditions with high precision and frequency.
+                </div>
+            </div>
+
+            <div class="tech-card">
+                <span class="tech-icon">🔗</span>
+                <h3 class="tech-title">API Integration</h3>
+                <div class="tech-description">
+                    Seamless integration with existing emergency response systems, weather services, and government databases for comprehensive coverage.
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Flow Section -->
+        <section class="data-flow">
+            <h2 style="margin-bottom: 3rem; font-size: 2.5rem;">Data Flow & Processing</h2>
+            <div class="flow-diagram">
+                <div class="flow-item">
+                    <span style="font-size: 2rem; margin-bottom: 1rem;">📊</span>
+                    <h3>Data Collection</h3>
+                    <p>Sensors, satellites, and citizen reports</p>
+                </div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-item">
+                    <span style="font-size: 2rem; margin-bottom: 1rem;">⚡</span>
+                    <h3>Real-time Processing</h3>
+                    <p>AI analysis and risk assessment</p>
+                </div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-item">
+                    <span style="font-size: 2rem; margin-bottom: 1rem;">🚨</span>
+                    <h3>Alert Generation</h3>
+                    <p>Automated hazard detection</p>
+                </div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-item">
+                    <span style="font-size: 2rem; margin-bottom: 1rem;">📢</span>
+                    <h3>Response Coordination</h3>
+                    <p>Emergency services activation</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Monitoring Capabilities -->
+        <div class="monitoring-section">
+            <h2 style="text-align: center; margin-bottom: 2rem; color: #2c3e50;">24/7 Monitoring Capabilities</h2>
+            <div class="monitoring-grid">
+                <div class="monitoring-item">
+                    <span class="monitoring-icon">🌊</span>
+                    <h3 class="monitoring-title">Wave Monitoring</h3>
+                    <div class="monitoring-description">
+                        Continuous tracking of wave heights, frequencies, and patterns using buoy sensors and satellite altimetry.
+                    </div>
+                </div>
+
+                <div class="monitoring-item">
+                    <span class="monitoring-icon">🌡️</span>
+                    <h3 class="monitoring-title">Temperature Tracking</h3>
+                    <div class="monitoring-description">
+                        Sea surface temperature monitoring to detect anomalies that may indicate upcoming weather events or ocean currents.
+                    </div>
+                </div>
+
+                <div class="monitoring-item">
+                    <span class="monitoring-icon">💨</span>
+                    <h3 class="monitoring-title">Current Analysis</h3>
+                    <div class="monitoring-description">
+                        Ocean current speed and direction monitoring to predict drift patterns and potential flooding scenarios.
+                    </div>
+                </div>
+
+                <div class="monitoring-item">
+                    <span class="monitoring-icon">📏</span>
+                    <h3 class="monitoring-title">Tidal Monitoring</h3>
+                    <div class="monitoring-description">
+                        Precise tidal level tracking with predictions for high tide flooding and storm surge amplification.
+                    </div>
+                </div>
+
+                <div class="monitoring-item">
+                    <span class="monitoring-icon">🏖️</span>
+                    <h3 class="monitoring-title">Coastal Erosion</h3>
+                    <div class="monitoring-description">
+                        Shoreline monitoring using satellite imagery and ground sensors to detect erosion patterns and land loss.
+                    </div>
+                </div>
+
+                <div class="monitoring-item">
+                    <span class="monitoring-icon">🌧️</span>
+                    <h3 class="monitoring-title">Weather Integration</h3>
+                    <div class="monitoring-description">
+                        Integration with meteorological data to correlate weather patterns with coastal hazard probabilities.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Response Timeline -->
+        <div class="response-section">
+            <h2 style="color: #2c3e50; font-size: 2.5rem; margin-bottom: 1rem;">Emergency Response Timeline</h2>
+            <p style="color: #666; font-size: 1.2rem; margin-bottom: 3rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+                Our automated response system ensures rapid action based on hazard severity
+            </p>
+
+            <div class="response-timeline">
+                <div class="response-item">
+                    <div class="response-time">0-15 min</div>
+                    <div class="response-action">Critical Hazards</div>
+                    <div class="response-description">
+                        Immediate SMS alerts to all registered users, emergency services notification, and automated warning systems activation.
+                    </div>
+                </div>
+
+                <div class="response-item">
+                    <div class="response-time">15-60 min</div>
+                    <div class="response-action">High Severity</div>
+                    <div class="response-description">
+                        Local authority coordination, community leaders notification, and preparation of emergency response teams.
+                    </div>
+                </div>
+
+                <div class="response-item">
+                    <div class="response-action">Medium Severity</div>
+                    <div class="response-description">
+                        Advisory alerts, monitoring station activation, and preparation of contingency plans for affected areas.
+                    </div>
+                </div>
+
+                <div class="response-item">
+                    <div class="response-action">Low Severity</div>
+                    <div class="response-description">
+                        General awareness notifications and increased monitoring of the affected coastal region.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer style="background: rgba(0,0,0,0.8); color: white; padding: 3rem 0; text-align: center; position: relative; z-index: 1;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
+            <p style="margin: 0; font-size: 1.1rem;">© 2025 CoastSense Project. Protecting coastal communities through innovation.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="../static/js/anime.min.js"></script>
+    <script src="../static/js/jquery-3.5.1.min.dc5e7f18c8.js"></script>
+    <script src="../static/js/page-transition.js"></script>
+    <script src="../static/js/text-scroll-animation.js"></script>
+    <script src="../static/js/main.js"></script>
+
+</body>
+</html>

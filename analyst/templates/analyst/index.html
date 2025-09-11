@@ -1,0 +1,630 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ocean Hazard Monitoring System - OHMS Dashboard</title>
+    <link rel="stylesheet" href="{% static 'analyst/style.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h1 class="sidebar-title">OHMS</h1>
+                <p class="sidebar-subtitle">Ocean Hazard Monitoring System</p>
+            </div>
+            
+            <div class="user-info">
+    <div class="user-avatar">{{ request.user.first_name|slice:":1" }}{{ request.user.last_name|slice:":1" }}</div>
+        <div class="user-details">
+            <div class="user-name">Welcome, {{ request.user.first_name }} {{ request.user.last_name }}</div>
+            <div class="user-role">Analyst</div>
+        </div>
+    </div>
+
+            
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <button class="nav-link active" data-section="dashboard">
+                        <span class="nav-icon">📊</span>
+                        <span class="nav-text">Dashboard</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-section="analytics">
+                        <span class="nav-icon">📈</span>
+                        <span class="nav-text">Analytics</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-section="statistics">
+                        <span class="nav-icon">📋</span>
+                        <span class="nav-text">Statistics</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-section="reports">
+                        <span class="nav-icon">📄</span>
+                        <span class="nav-text">Reports</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-section="data-management">
+                        <span class="nav-icon">🗃️</span>
+                        <span class="nav-text">Data Management</span>
+                    </button>
+                </li>
+            </ul>
+            
+            <div class="sidebar-footer">
+                <div class="status-indicator">
+                    <span class="status-dot active"></span>
+                    <span class="status-text">System Online</span>
+                </div>
+            </div>
+        </nav>
+        
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard-section" class="content-section active">
+                <div class="section-header">
+                    <h2>Dashboard Overview</h2>
+                    <div class="last-updated">Last updated: <span id="current-time">Sep 08, 2025 00:22 IST</span></div>
+                </div>
+                
+                <!-- Alert Banner -->
+                <div class="alert-banner warning">
+                    <span class="alert-icon">⚠️</span>
+                    <span class="alert-text">Active Tsunami Watch - Pacific Northwest Region</span>
+                    <button class="alert-close">×</button>
+                </div>
+                
+                <!-- Key Metrics Cards -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-icon">🏭</div>
+                        <div class="metric-content">
+                            <div class="metric-value">142</div>
+                            <div class="metric-label">Active Datasets</div>
+                        </div>
+                        <div class="metric-trend up">+3.2%</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-icon">📊</div>
+                        <div class="metric-content">
+                            <div class="metric-value">89</div>
+                            <div class="metric-label">Active Stations</div>
+                        </div>
+                        <div class="metric-trend up">+1.5%</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-icon">📈</div>
+                        <div class="metric-content">
+                            <div class="metric-value">28</div>
+                            <div class="metric-label">Reports This Month</div>
+                        </div>
+                        <div class="metric-trend up">+12.3%</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        
+                        <div class="metric-icon">🎯</div>
+                        <div class="metric-content">
+                            <div class="metric-value">97.3%</div>
+                            <div class="metric-label">Detection Accuracy</div>
+                        </div>
+                        <div class="metric-trend up">+0.8%</div>
+                    </div>
+                </div>
+
+                <!-- Quick Charts -->
+                <div class="dashboard-charts">
+                    <div class="chart-card">
+                        <h3>Recent Tsunami Activity</h3>
+                        <div class="chart-container" style="position: relative; height: 300px;">
+                            <canvas id="tsunami-activity-chart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <h3>System Performance</h3>
+                        <div class="chart-container" style="position: relative; height: 300px;">
+                            <canvas id="performance-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Alerts -->
+                <div class="recent-alerts card">
+                    <h3>Recent Alerts</h3>
+                    <div class="alerts-list">
+                        <div class="alert-item medium">
+                            <div class="alert-status"></div>
+                            <div class="alert-details">
+                                <div class="alert-title">Tsunami Watch - Pacific Northwest</div>
+                                <div class="alert-time">2025-09-08 00:15:00 IST</div>
+                            </div>
+                        </div>
+                        <div class="alert-item high">
+                            <div class="alert-status"></div>
+                            <div class="alert-details">
+                                <div class="alert-title">Storm Surge Warning - Gulf Coast</div>
+                                <div class="alert-time">2025-09-07 22:30:00 IST</div>
+                            </div>
+                        </div>
+                        <div class="alert-item low">
+                            <div class="alert-status"></div>
+                            <div class="alert-details">
+                                <div class="alert-title">Equipment Maintenance - Station 32412</div>
+                                <div class="alert-time">2025-09-07 18:45:00 IST</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Analytics Section -->
+            <section id="analytics-section" class="content-section">
+                <div class="section-header">
+                    <h2>Advanced Analytics</h2>
+                    <p class="section-description">Analyze ocean hazard data and trends with advanced tools and algorithms</p>
+                    <button class="refresh-btn" onclick="manualRefreshAnalytics()">Refresh All Data</button>
+                </div>
+                {% csrf_token %}
+                <div class="analytics-grid">
+                    <div class="analytics-card">
+                        <div class="card-header">
+                            <h3>Real-time DART Buoy Monitoring</h3>
+                            <button class="refresh-btn" onclick="refreshBuoyData()">Refresh Data</button>
+                        </div>
+                        <div class="chart-container" style="position: relative; height: 350px;">
+                            <canvas id="dart-buoy-chart"></canvas>
+                        </div>
+                        <div class="buoy-status-grid">
+                            <div class="buoy-status active">
+                                <span class="buoy-id">23001</span>
+                                <span class="buoy-reading">2.1m</span>
+                            </div>
+                            <div class="buoy-status active">
+                                <span class="buoy-id">23101</span>
+                                <span class="buoy-reading">1.8m</span>
+                            </div>
+                            <div class="buoy-status maintenance">
+                                <span class="buoy-id">23007</span>
+                                <span class="buoy-reading">--</span>
+                            </div>
+                            <div class="buoy-status active">
+                                <span class="buoy-id">46002</span>
+                                <span class="buoy-reading">3.2m</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="analytics-card">
+                        <div class="card-header">
+                            <h3>Storm Surge Analysis</h3>
+                            <button class="refresh-btn" onclick="refreshStormSurgeData()">Refresh Data</button>
+                        </div>
+                        <div class="chart-container" style="position: relative; height: 350px;">
+                            <canvas id="storm-surge-chart"></canvas>
+                        </div>
+                        <div class="surge-alerts">
+                            <div class="surge-alert high">
+                                <div class="surge-location">Bay of Bengal</div>
+                                <div class="surge-height">3.4m surge expected</div>
+                            </div>
+                            <div class="surge-alert medium">
+                                <div class="surge-location">Arabian Sea Coast</div>
+                                <div class="surge-height">2.1m surge expected</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="analytics-card">
+                        <div class="card-header">
+                            <h3>Seismic Activity Correlation</h3>
+                            <button class="refresh-btn" onclick="refreshSeismicData()">Refresh Data</button>
+                        </div>
+                        <div class="chart-container" style="position: relative; height: 350px;">
+                            <canvas id="seismic-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="analytics-card">
+                        <div class="card-header">
+                            <h3>Regional Risk Assessment</h3>
+                            <button class="refresh-btn" onclick="refreshRiskAssessmentData()">Refresh Data</button>
+                        </div>
+                        <div class="risk-heatmap">
+                            <div class="risk-region high">
+                                <span class="region-name">Sumatra Coast</span>
+                                <span class="risk-score">8.7</span>
+                            </div>
+                            <div class="risk-region very-high">
+                                <span class="region-name">Andaman Islands</span>
+                                <span class="risk-score">8.2</span>
+                            </div>
+                            <div class="risk-region medium">
+                                <span class="region-name">Sri Lanka Coast</span>
+                                <span class="risk-score">7.4</span>
+                            </div>
+                            <div class="risk-region high">
+                                <span class="region-name">Maldives</span>
+                                <span class="risk-score">6.9</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Statistics Section -->
+            <section id="statistics-section" class="content-section">
+                <div class="section-header">
+                    <h2>Comprehensive Statistics</h2>
+                    <p class="section-description">View comprehensive statistics and key performance indicators</p>
+                </div>
+
+                <!-- KPI Dashboard -->
+                <div class="kpi-dashboard">
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <h4>Detection Accuracy</h4>
+                            <span class="kpi-trend positive">+0.8%</span>
+                        </div>
+                        <div class="kpi-value">97.3%</div>
+                        <div class="kpi-chart">
+                            <div class="kpi-progress" style="width: 97.3%"></div>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <h4>Response Time</h4>
+                            <span class="kpi-trend positive">-0.3min</span>
+                        </div>
+                        <div class="kpi-value">3.7min</div>
+                        <div class="kpi-chart">
+                            <div class="kpi-progress" style="width: 85%"></div>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <h4>System Uptime</h4>
+                            <span class="kpi-trend positive">+0.1%</span>
+                        </div>
+                        <div class="kpi-value">99.8%</div>
+                        <div class="kpi-chart">
+                            <div class="kpi-progress" style="width: 99.8%"></div>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <h4>False Alarm Rate</h4>
+                            <span class="kpi-trend positive">-0.2%</span>
+                        </div>
+                        <div class="kpi-value">2.1%</div>
+                        <div class="kpi-chart">
+                            <div class="kpi-progress warning" style="width: 21%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistical Charts -->
+                <div class="stats-charts">
+                    <div class="stats-card">
+                        <h3>Monthly Alert Distribution</h3>
+                        <div class="chart-container" style="position: relative; height: 300px;">
+                            <canvas id="alert-distribution-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="stats-card">
+                        <h3>Detection Method Comparison</h3>
+                        <div class="chart-container" style="position: relative; height: 300px;">
+                            <canvas id="method-comparison-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="stats-card">
+                        <h3>Seasonal Hazard Patterns</h3>
+                        <div class="chart-container" style="position: relative; height: 300px;">
+                            <canvas id="seasonal-patterns-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="stats-card">
+                        <h3>Station Performance Matrix</h3>
+                        <div class="chart-container" style="position: relative; height: 300px;">
+                            <canvas id="station-performance-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Reports Section -->
+            <section id="reports-section" class="content-section">
+                <div class="section-header">
+                    <h2>Analytical Reports</h2>
+                    <p class="section-description">Create detailed analytical reports and share insights with stakeholders</p>
+                    <button class="btn btn--primary" id="generate-report-btn">+ Generate New Report</button>
+                </div>
+
+                <!-- Report Templates -->
+                <div class="report-templates">
+                    <div class="template-card">
+                        <h4>Event Analysis Report</h4>
+                        <p>Comprehensive analysis of specific tsunami or storm surge events</p>
+                        <button class="btn btn--outline" data-template="event">Select Template</button>
+                    </div>
+                    <div class="template-card">
+                        <h4>Risk Assessment Summary</h4>
+                        <p>Regional risk evaluation and hazard probability assessment</p>
+                        <button class="btn btn--outline" data-template="risk">Select Template</button>
+                    </div>
+                    <div class="template-card">
+                        <h4>Performance Evaluation</h4>
+                        <p>System performance metrics and detection accuracy analysis</p>
+                        <button class="btn btn--outline" data-template="performance">Select Template</button>
+                    </div>
+                    <div class="template-card">
+                        <h4>Compliance Report</h4>
+                        <p>Regulatory compliance status and audit documentation</p>
+                        <button class="btn btn--outline" data-template="compliance">Select Template</button>
+                    </div>
+                </div>
+
+                <!-- Recent Reports -->
+                <div class="reports-list card">
+                    <h3>Recent Reports (28 this month)</h3>
+                    <div class="report-item">
+                        <div class="report-info">
+                            <div class="report-title">Monthly Tsunami Detection Summary</div>
+                            <div class="report-meta">RPT2025-001 • Sep 01, 2025 • Performance Report</div>
+                        </div>
+                        <div class="report-status published">Published</div>
+                        <div class="report-actions">
+                            <button class="btn btn--sm btn--outline">View</button>
+                            <button class="btn btn--sm btn--outline">Export</button>
+                        </div>
+                    </div>
+                    <div class="report-item">
+                        <div class="report-info">
+                            <div class="report-title">Hurricane Season Storm Surge Analysis</div>
+                            <div class="report-meta">RPT2025-002 • Aug 28, 2025 • Risk Assessment</div>
+                        </div>
+                        <div class="report-status published">Published</div>
+                        <div class="report-actions">
+                            <button class="btn btn--sm btn--outline">View</button>
+                            <button class="btn btn--sm btn--outline">Export</button>
+                        </div>
+                    </div>
+                    <div class="report-item">
+                        <div class="report-info">
+                            <div class="report-title">DART Network Maintenance Report</div>
+                            <div class="report-meta">RPT2025-003 • Aug 25, 2025 • Technical Report</div>
+                        </div>
+                        <div class="report-status draft">Draft</div>
+                        <div class="report-actions">
+                            <button class="btn btn--sm btn--outline">Edit</button>
+                            <button class="btn btn--sm btn--secondary">Publish</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Export Options -->
+                <div class="export-section card">
+                    <h3>Export & Share</h3>
+                    <div class="export-options">
+                        <button class="btn btn--secondary">Export as PDF</button>
+                        <button class="btn btn--secondary">Export Data</button>
+                        <button class="btn btn--secondary">Schedule Report</button>
+                        <button class="btn btn--secondary">Share with Team</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Data Management Section -->
+            <section id="data-management-section" class="content-section">
+                <div class="section-header">
+                    <h2>Data Management</h2>
+                    <p class="section-description">Manage and organize ocean hazard datasets efficiently</p>
+                </div>
+
+                <!-- Data Sources Status -->
+                <div class="data-sources">
+                    <div class="source-card operational">
+                        <div class="source-header">
+                            <h4>DART Buoy Network</h4>
+                            <span class="source-status">Operational</span>
+                        </div>
+                        <div class="source-metrics">
+                            <div class="metric">
+                                <span class="label">Active Stations:</span>
+                                <span class="value">3/4</span>
+                            </div>
+                            <div class="metric">
+                                <span class="label">Last Update:</span>
+                                <span class="value">00:21 IST</span>
+                            </div>
+                            <div class="metric">
+                                <span class="label">Data Quality:</span>
+                                <span class="value">98.2%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="source-card operational">
+                        <div class="source-header">
+                            <h4>Seismic Monitoring</h4>
+                            <span class="source-status">Operational</span>
+                        </div>
+                        <div class="source-metrics">
+                            <div class="metric">
+                                <span class="label">Active Sensors:</span>
+                                <span class="value">45/47</span>
+                            </div>
+                            <div class="metric">
+                                <span class="label">Last Update:</span>
+                                <span class="value">00:20 IST</span>
+                            </div>
+                            <div class="metric">
+                                <span class="label">Data Quality:</span>
+                                <span class="value">96.8%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="source-card maintenance">
+                        <div class="source-header">
+                            <h4>Weather Stations</h4>
+                            <span class="source-status">Maintenance</span>
+                        </div>
+                        <div class="source-metrics">
+                            <div class="metric">
+                                <span class="label">Active Stations:</span>
+                                <span class="value">38/41</span>
+                            </div>
+                            <div class="metric">
+                                <span class="label">Last Update:</span>
+                                <span class="value">23:45 IST</span>
+                            </div>
+                            <div class="metric">
+                                <span class="label">Data Quality:</span>
+                                <span class="value">94.5%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="source-card operational">
+                        <div class="source-header">
+                            <h4>Tide Gauges</h4>
+                            <span class="source-status">Operational</span>
+                        </div>
+                        <div class="source-metrics">
+                            <div class="metric">
+                                <span class="label">Active Gauges:</span>
+                                <span class="value">89/92</span>
+                            </div>
+                            <div class="metric">
+                                <span class="label">Last Update:</span>
+                                <span class="value">00:22 IST</span>
+                            </div>
+                            <div class="metric">
+                                <span class="label">Data Quality:</span>
+                                <span class="value">97.1%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Processing Pipeline -->
+                <div class="pipeline-status card">
+                    <h3>Data Processing Pipeline</h3>
+                    <div class="pipeline-steps">
+                        <div class="pipeline-step completed">
+                            <div class="step-icon">✓</div>
+                            <div class="step-info">
+                                <div class="step-title">Data Ingestion</div>
+                                <div class="step-status">Completed - 00:22 IST</div>
+                            </div>
+                        </div>
+                        <div class="pipeline-step processing">
+                            <div class="step-icon">⟳</div>
+                            <div class="step-info">
+                                <div class="step-title">Quality Validation</div>
+                                <div class="step-status">Processing - 85% complete</div>
+                            </div>
+                        </div>
+                        <div class="pipeline-step pending">
+                            <div class="step-icon">⏳</div>
+                            <div class="step-info">
+                                <div class="step-title">Analysis Engine</div>
+                                <div class="step-status">Pending - Queue: 3 jobs</div>
+                            </div>
+                        </div>
+                        <div class="pipeline-step pending">
+                            <div class="step-icon">⏳</div>
+                            <div class="step-info">
+                                <div class="step-title">Alert Generation</div>
+                                <div class="step-status">Standby</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Storage & Backup -->
+                <div class="storage-info">
+                    <div class="storage-card">
+                        <h4>Storage Utilization</h4>
+                        <div class="storage-chart">
+                            <div class="storage-bar">
+                                <div class="storage-used" style="width: 73%"></div>
+                            </div>
+                            <div class="storage-details">
+                                <span>7.3 TB used of 10 TB</span>
+                                <span class="storage-percentage">73%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="storage-card">
+                        <h4>Backup Status</h4>
+                        <div class="backup-status">
+                            <div class="backup-item">
+                                <span class="backup-type">Daily Backup</span>
+                                <span class="backup-time status--success">Completed 02:00 IST</span>
+                            </div>
+                            <div class="backup-item">
+                                <span class="backup-type">Weekly Archive</span>
+                                <span class="backup-time status--success">Completed Sep 07</span>
+                            </div>
+                            <div class="backup-item">
+                                <span class="backup-type">Offsite Sync</span>
+                                <span class="backup-time status--warning">In Progress</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="storage-card">
+                        <h4>API Endpoints</h4>
+                        <div class="api-status">
+                            <div class="api-endpoint">
+                                <span class="endpoint-name">/api/v1/buoys</span>
+                                <span class="endpoint-status operational">Online</span>
+                            </div>
+                            <div class="api-endpoint">
+                                <span class="endpoint-name">/api/v1/alerts</span>
+                                <span class="endpoint-status operational">Online</span>
+                            </div>
+                            <div class="api-endpoint">
+                                <span class="endpoint-name">/api/v1/reports</span>
+                                <span class="endpoint-status operational">Online</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Real-time Update Notification -->
+    <div id="update-notification" class="update-notification hidden">
+        <span class="notification-text">New data available</span>
+        <button class="notification-action">Refresh</button>
+    </div>
+
+    <script src="{% static 'analyst/app.js' %}"></script>
+    <script src="{% static 'analyst/storm_anlysis.js' %}"></script>
+    <script src="{% static 'analyst/dartBuoy.js' %}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+</body>
+</html>
