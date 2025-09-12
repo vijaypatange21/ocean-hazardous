@@ -4,6 +4,8 @@ from django.utils import timezone
 import json
 from datetime import datetime, timedelta
 import logging
+from django.db import models
+from django.contrib.auth.models import User
 
 logger = logging.getLogger(__name__)
 
@@ -134,3 +136,50 @@ def update_india_buoys():
         logger.info("Successfully updated Indian Ocean buoys")
     except Exception as e:
         logger.error(f"Failed to fetch Indian Ocean buoys: {e}")
+        
+
+class Report(models.Model):
+    STATUS_CHOICES = (
+        ('draft', 'Draft'),
+        ('submitted', 'Submitted'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    )
+    
+    REPORT_TYPES = (
+        ('event', 'Event Analysis Report'),
+        ('risk', 'Risk Assessment Summary'),
+        ('performance', 'Performance Evaluation'),
+        ('compliance', 'Compliance Report'),
+    )
+    
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    report_type = models.CharField(max_length=32, choices=REPORT_TYPES)
+    status = models.CharField(max_length=16, choices=STATUS_CHOICES, default='draft')
+    
+    # User relationships
+    created_by = models.ForeignKey(User, related_name='reports_created', on_delete=models.CASCADE)
+    submitted_to = models.ForeignKey(User, related_name='reports_assigned', blank=True, null=True, on_delete=models.SET_NULL)
+    
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    submitted_at = models.DateTimeField(blank=True, null=True)
+    
+    # File attachment
+    attachment = models.FileField(upload_to='report_attachments/', blank=True, null=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.title} - {self.get_status_display()}"
+
+class ReportComment(models.Model):
+    report = models.ForeignKey(Report, related_name='comments', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    comment = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-created_at']

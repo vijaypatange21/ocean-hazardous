@@ -353,84 +353,187 @@
             <!-- Reports Section -->
             <section id="reports-section" class="content-section">
                 <div class="section-header">
-                    <h2>Analytical Reports</h2>
-                    <p class="section-description">Create detailed analytical reports and share insights with stakeholders</p>
-                    <button class="btn btn--primary" id="generate-report-btn">+ Generate New Report</button>
+                    <div>
+                        <h2>Analytical Reports</h2>
+                        <p class="section-description">Create detailed analytical reports and share insights with stakeholders</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="toggleReportForm()">
+                        ✨ Create New Report
+                    </button>
                 </div>
 
-                <!-- Report Templates -->
-                <div class="report-templates">
-                    <div class="template-card">
-                        <h4>Event Analysis Report</h4>
-                        <p>Comprehensive analysis of specific tsunami or storm surge events</p>
-                        <button class="btn btn--outline" data-template="event">Select Template</button>
+                <!-- Report Statistics -->
+                <div class="report-stats">
+                    <div class="stat-card">
+                        <h3>{{ total_reports|default:0 }}</h3>
+                        <p>📊 Total Reports</p>
                     </div>
-                    <div class="template-card">
-                        <h4>Risk Assessment Summary</h4>
-                        <p>Regional risk evaluation and hazard probability assessment</p>
-                        <button class="btn btn--outline" data-template="risk">Select Template</button>
+                    <div class="stat-card">
+                        <h3>{{ draft_reports|default:0 }}</h3>
+                        <p>📝 Drafts</p>
                     </div>
-                    <div class="template-card">
-                        <h4>Performance Evaluation</h4>
-                        <p>System performance metrics and detection accuracy analysis</p>
-                        <button class="btn btn--outline" data-template="performance">Select Template</button>
+                    <div class="stat-card">
+                        <h3>{{ submitted_reports|default:0 }}</h3>
+                        <p>📤 Submitted</p>
                     </div>
-                    <div class="template-card">
-                        <h4>Compliance Report</h4>
-                        <p>Regulatory compliance status and audit documentation</p>
-                        <button class="btn btn--outline" data-template="compliance">Select Template</button>
+                    <div class="stat-card">
+                        <h3>{{ approved_reports|default:0 }}</h3>
+                        <p>✅ Approved</p>
                     </div>
                 </div>
 
                 <!-- Recent Reports -->
-                <div class="reports-list card">
-                    <h3>Recent Reports (28 this month)</h3>
-                    <div class="report-item">
-                        <div class="report-info">
-                            <div class="report-title">Monthly Tsunami Detection Summary</div>
-                            <div class="report-meta">RPT2025-001 • Sep 01, 2025 • Performance Report</div>
+                <div class="reports-list">
+                    <h3>Recent Reports</h3>
+                    {% for report in reports %}
+                    <div class="report-card" data-report-id="{{ report.id }}">
+                        <div class="report-header">
+                            <h4>{{ report.title }}</h4>
+                            <span class="status-badge status-{{ report.status }}">
+                                {{ report.get_status_display }}
+                            </span>
                         </div>
-                        <div class="report-status published">Published</div>
+                        
+                        <div class="report-meta">
+                            <p><strong>🆔 ID:</strong> RPT{{ report.id }}</p>
+                            <p><strong>📋 Type:</strong> {{ report.get_report_type_display }}</p>
+                            <p><strong>📅 Created:</strong> {{ report.created_at|date:"M d, Y H:i" }}</p>
+                            {% if report.submitted_to %}
+                            <p><strong>👤 Assigned to:</strong> {{ report.submitted_to.get_full_name|default:report.submitted_to.username }}</p>
+                            {% endif %}
+                            {% if report.submitted_at %}
+                            <p><strong>📤 Submitted:</strong> {{ report.submitted_at|date:"M d, Y H:i" }}</p>
+                            {% endif %}
+                        </div>
+
                         <div class="report-actions">
-                            <button class="btn btn--sm btn--outline">View</button>
-                            <button class="btn btn--sm btn--outline">Export</button>
+                            <a href="{% url 'analyst:report_detail' report.id %}" class="btn btn-outline">
+                                👁️ View Details
+                            </a>
+                            
+                            {% if report.status == 'draft' %}
+                            <button onclick="showSubmitForm({{ report.id }})" class="btn btn-success">
+                                🚀 Submit to Admin
+                            </button>
+                            {% endif %}
                         </div>
+
+                        <!-- Submit Form (Hidden by default) -->
+                        {% if report.status == 'draft' %}
+                        <div id="submit-form-{{ report.id }}" class="submit-form" style="display: none;">
+                            <form method="post" action="{% url 'analyst:submit_report' report.id %}">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <label>👤 Select Admin:</label>
+                                    <select name="admin_id" required>
+                                        <option value="">-- Choose Admin --</option>
+                                        {% for admin in admin_list %}
+                                        <option value="{{ admin.id }}">
+                                            {{ admin.get_full_name|default:admin.username }}
+                                            {% if admin.email %} ({{ admin.email }}){% endif %}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="submit" class="btn btn-success">✅ Submit Report</button>
+                                    <button type="button" onclick="hideSubmitForm({{ report.id }})" class="btn btn-secondary">❌ Cancel</button>
+                                </div>
+                            </form>
+                        </div>
+                        {% endif %}
                     </div>
-                    <div class="report-item">
-                        <div class="report-info">
-                            <div class="report-title">Hurricane Season Storm Surge Analysis</div>
-                            <div class="report-meta">RPT2025-002 • Aug 28, 2025 • Risk Assessment</div>
-                        </div>
-                        <div class="report-status published">Published</div>
-                        <div class="report-actions">
-                            <button class="btn btn--sm btn--outline">View</button>
-                            <button class="btn btn--sm btn--outline">Export</button>
-                        </div>
-                    </div>
-                    <div class="report-item">
-                        <div class="report-info">
-                            <div class="report-title">DART Network Maintenance Report</div>
-                            <div class="report-meta">RPT2025-003 • Aug 25, 2025 • Technical Report</div>
-                        </div>
-                        <div class="report-status draft">Draft</div>
-                        <div class="report-actions">
-                            <button class="btn btn--sm btn--outline">Edit</button>
-                            <button class="btn btn--sm btn--secondary">Publish</button>
-                        </div>
-                    </div>
+                    {% empty %}
+                    <p>📄 No reports created yet. Click "Create New Report" to get started!</p>
+                    {% endfor %}
                 </div>
 
-                <!-- Export Options -->
-                <div class="export-section card">
-                    <h3>Export & Share</h3>
-                    <div class="export-options">
-                        <button class="btn btn--secondary">Export as PDF</button>
-                        <button class="btn btn--secondary">Export Data</button>
-                        <button class="btn btn--secondary">Schedule Report</button>
-                        <button class="btn btn--secondary">Share with Team</button>
-                    </div>
+                <!-- Create Report Form (Hidden by default) -->
+                <div id="create-report-form" style="display: none;">
+                    <h3>Create New Report</h3>
+                    <form method="post" action="{% url 'analyst:create_report' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="title">📝 Report Title *</label>
+                            <input type="text" name="title" id="title" required placeholder="Enter a descriptive report title">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="description">📋 Description</label>
+                            <textarea name="description" id="description" rows="3" placeholder="Provide additional details about the report (optional)"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="report_type">📊 Report Type *</label>
+                            <select name="report_type" id="report_type" required>
+                                <option value="">-- Select Report Type --</option>
+                                <option value="event">🌊 Event Analysis Report</option>
+                                <option value="risk">⚠️ Risk Assessment Summary</option>
+                                <option value="performance">📈 Performance Evaluation</option>
+                                <option value="compliance">✅ Compliance Report</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="admin">👤 Assign to Admin *</label>
+                            <select name="admin" id="admin" required>
+                                <option value="">-- Select Admin --</option>
+                                {% for admin in admin_list %}
+                                <option value="{{ admin.id }}">
+                                    {{ admin.get_full_name|default:admin.username }}
+                                    {% if admin.email %} ({{ admin.email }}){% endif %}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="attachment">📎 Attach File</label>
+                            <input type="file" name="attachment" id="attachment">
+                            <small>💡 Optional: Upload supporting documents, charts, or data files</small>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">✨ Create Report</button>
+                            <button type="button" onclick="toggleReportForm()" class="btn btn-secondary">❌ Cancel</button>
+                        </div>
+                    </form>
                 </div>
             </section>
+
+
+            <script>
+            function toggleReportForm() {
+                const form = document.getElementById('create-report-form');
+                form.style.display = form.style.display === 'none' ? 'block' : 'none';
+            }
+
+            function showSubmitForm(reportId) {
+                document.getElementById('submit-form-' + reportId).style.display = 'block';
+            }
+
+            function hideSubmitForm(reportId) {
+                document.getElementById('submit-form-' + reportId).style.display = 'none';
+            }
+
+            // Auto-refresh status every 30 seconds
+            setInterval(function() {
+                document.querySelectorAll('.report-card').forEach(function(card) {
+                    const reportId = card.dataset.reportId;
+                    if (reportId) {
+                        fetch(`/analyst/api/report-status/${reportId}/`)
+                            .then(response => response.json())
+                            .then(data => {
+                                // Update status badge
+                                const badge = card.querySelector('.status-badge');
+                                badge.textContent = data.status_display;
+                                badge.className = `status-badge status-${data.status}`;
+                            });
+                    }
+                });
+            }, 30000);
+            </script>
+
 
             <!-- Data Management Section -->
             <section id="data-management-section" class="content-section">

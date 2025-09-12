@@ -1,6 +1,5 @@
 from django.contrib import admin
 from .models import SatelliteReading, OceanHazard
-
 # Alternative registration method to avoid conflicts
 class SatelliteReadingAdmin(admin.ModelAdmin):
     list_display = ['timestamp', 'latitude', 'longitude', 'sea_surface_temperature', 'wave_height']

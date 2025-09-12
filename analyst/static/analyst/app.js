@@ -826,3 +826,39 @@ if (typeof Chart !== 'undefined') {
     Chart.defaults.font.family = 'FKGroteskNeue, Inter, sans-serif';
     Chart.defaults.color = '#626C71';
 }
+
+function toggleReportForm() {
+    const form = document.getElementById('create-report-form');
+    const isVisible = form.style.display !== 'none';
+    form.style.display = isVisible ? 'none' : 'block';
+    
+    if (!isVisible) {
+        form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+}
+
+function showSubmitForm(reportId) {
+    document.getElementById('submit-form-' + reportId).style.display = 'block';
+}
+
+function hideSubmitForm(reportId) {
+    document.getElementById('submit-form-' + reportId).style.display = 'none';
+}
+
+// Auto-refresh report status
+function refreshReportStatus() {
+    document.querySelectorAll('.report-card[data-report-id]').forEach(function(card) {
+        const reportId = card.dataset.reportId;
+        fetch(`/analyst/api/report-status/${reportId}/`)
+            .then(response => response.json())
+            .then(data => {
+                const badge = card.querySelector('.status-badge');
+                badge.textContent = data.status_display;
+                badge.className = `status-badge status-${data.status}`;
+            })
+            .catch(error => console.error('Error:', error));
+    });
+}
+
+// Refresh status every 30 seconds
+setInterval(refreshReportStatus, 30000);

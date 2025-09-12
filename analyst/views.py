@@ -1,5 +1,5 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
+# from django.shortcuts import render, redirect
+# from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
@@ -8,7 +8,151 @@ from .models import DartBuoy, update_india_buoys, BuoyReading
 import json
 import random
 import math
+
 from datetime import datetime, timedelta
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.utils import timezone
+from django.contrib.auth.models import User
+from .models import Report, ReportComment
+# import json
+
+@login_required
+def dashboard(request):
+    """Main dashboard view"""
+    reports = Report.objects.filter(created_by=request.user)
+    admin_list = User.objects.filter(is_staff=True)
+    
+    context = {
+        'reports': reports,
+        'admin_list': admin_list,
+        'total_reports': reports.count(),
+        'draft_reports': reports.filter(status='draft').count(),
+        'submitted_reports': reports.filter(status='submitted').count(),
+        'approved_reports': reports.filter(status='approved').count(),
+    }
+    return render(request, 'analyst/dashboard.html', context)
+
+@login_required
+def create_report(request):
+    """Create a new report"""
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        description = request.POST.get('description', '')
+        report_type = request.POST.get('report_type')
+        admin_id = request.POST.get('admin')
+        attachment = request.FILES.get('attachment')
+        
+        # Validate required fields
+        if not all([title, report_type, admin_id]):
+            messages.error(request, 'Please fill in all required fields.')
+            return redirect('analyst:dashboard')
+        
+        try:
+            submitted_to = User.objects.get(id=admin_id, is_staff=True)
+            
+            report = Report.objects.create(
+                title=title,
+                description=description,
+                report_type=report_type,
+                submitted_to=submitted_to,
+                created_by=request.user,
+                attachment=attachment,
+            )
+            
+            messages.success(request, f'Report "{title}" created successfully!')
+            return redirect('analyst:dashboard')
+            
+        except User.DoesNotExist:
+            messages.error(request, 'Selected admin not found.')
+            return redirect('analyst:dashboard')
+    
+    return redirect('analyst:dashboard')
+
+@login_required
+def submit_report(request, report_id):
+    """Submit a draft report to an admin"""
+    report = get_object_or_404(Report, id=report_id, created_by=request.user)
+    
+    if request.method == 'POST':
+        admin_id = request.POST.get('admin_id')
+        
+        if not admin_id:
+            messages.error(request, 'Please select an admin to submit to.')
+            return redirect('analyst:dashboard')
+        
+        try:
+            admin_user = User.objects.get(id=admin_id, is_staff=True)
+            report.submitted_to = admin_user
+            report.status = 'submitted'
+            report.submitted_at = timezone.now()
+            report.save()
+            
+            messages.success(request, f'Report "{report.title}" submitted to {admin_user.get_full_name() or admin_user.username} successfully!')
+            
+        except User.DoesNotExist:
+            messages.error(request, 'Selected admin not found.')
+    
+    return redirect('analyst:dashboard')
+
+@login_required
+def report_detail(request, report_id):
+    """View detailed report information"""
+    report = get_object_or_404(Report, id=report_id, created_by=request.user)
+    comments = report.comments.all()
+    admin_list = User.objects.filter(is_staff=True)
+    
+    context = {
+        'report': report,
+        'comments': comments,
+        'admin_list': admin_list,
+    }
+    return render(request, 'analyst/report_detail.html', context)
+
+@login_required
+def update_report_status(request, report_id):
+    """Update report status (for admins)"""
+    if not request.user.is_staff:
+        messages.error(request, 'Permission denied.')
+        return redirect('analyst:dashboard')
+    
+    report = get_object_or_404(Report, id=report_id)
+    
+    if request.method == 'POST':
+        new_status = request.POST.get('status')
+        comment_text = request.POST.get('comment', '')
+        
+        if new_status in ['approved', 'rejected']:
+            report.status = new_status
+            report.save()
+            
+            # Add comment if provided
+            if comment_text:
+                ReportComment.objects.create(
+                    report=report,
+                    user=request.user,
+                    comment=comment_text
+                )
+            
+            messages.success(request, f'Report status updated to {new_status}.')
+        
+    return redirect('analyst:report_detail', report_id=report.id)
+
+# API endpoint for real-time updates
+@login_required
+def get_report_status(request, report_id):
+    """Get current report status (AJAX endpoint)"""
+    report = get_object_or_404(Report, id=report_id, created_by=request.user)
+    
+    data = {
+        'status': report.status,
+        'status_display': report.get_status_display(),
+        'submitted_to': report.submitted_to.get_full_name() if report.submitted_to else None,
+        'submitted_at': report.submitted_at.isoformat() if report.submitted_at else None,
+    }
+    
+    return JsonResponse(data)
 
 def analyst_required(view_func):
     def wrapper(request, *args, **kwargs):
@@ -328,3 +472,6 @@ def reports(request):
 def data_management(request):
     context = get_dashboard_context(request.user)
     return render(request, 'analyst/index.html', context)
+
+
+
