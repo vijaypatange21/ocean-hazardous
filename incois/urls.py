@@ -23,9 +23,8 @@ urlpatterns = [
     path('', include('login.urls')),
     path('visual/', include('visualizer.urls')),
     path('ana/', include('analyst.urls')),
-    # path(
-    #     'ocean_monitor/',
-    #     include(('ocean_monitor.urls', 'ocean_monitor'), namespace='ocean_monitor')
-    # ),
+    path('', include('ocean_monitor.urls')),
+    path('social_media/', include('scraper.urls'))
+
 ]
 

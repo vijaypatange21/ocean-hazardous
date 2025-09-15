@@ -37,25 +37,20 @@ class PageTransition {
     shouldTransition(link) {
         const href = link.getAttribute('href');
         // Skip external links, anchors, and javascript links
-        return href && 
-               !href.startsWith('#') && 
-               !href.startsWith('javascript:') && 
-               !href.startsWith('mailto:') && 
-               !href.startsWith('tel:') &&
-               !link.target;
+        return href && !href.startsWith('#') && !href.startsWith('javascript:') && !href.startsWith('mailto:') && !href.startsWith('tel:') && !link.target;
     }
 
     startTransition(url) {
         this.overlay.classList.add('active');
         this.video.currentTime = 0;
-        this.video.playbackRate = 3.2;
+        this.video.playbackRate = 6.4; // Doubled from 3.2
         this.video.play();
 
-        // Stop video after 2.5 seconds and navigate
+        // Stop video after 1.25 seconds (adjusted for 2x speed)
         setTimeout(() => {
             this.video.pause();
             window.location.href = url;
-        }, 2500);
+        }, 1250);
     }
 }
 

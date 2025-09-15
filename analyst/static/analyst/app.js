@@ -826,3 +826,92 @@ if (typeof Chart !== 'undefined') {
     Chart.defaults.font.family = 'FKGroteskNeue, Inter, sans-serif';
     Chart.defaults.color = '#626C71';
 }
+
+function toggleReportForm() {
+    const form = document.getElementById('create-report-form');
+    const isVisible = form.style.display !== 'none';
+    form.style.display = isVisible ? 'none' : 'block';
+    
+    if (!isVisible) {
+        form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+}
+
+function showSubmitForm(reportId) {
+    document.getElementById('submit-form-' + reportId).style.display = 'block';
+}
+
+function hideSubmitForm(reportId) {
+    document.getElementById('submit-form-' + reportId).style.display = 'none';
+}
+
+// Auto-refresh report status
+function refreshReportStatus() {
+    document.querySelectorAll('.report-card[data-report-id]').forEach(function(card) {
+        const reportId = card.dataset.reportId;
+        fetch(`/analyst/api/report-status/${reportId}/`)
+            .then(response => response.json())
+            .then(data => {
+                const badge = card.querySelector('.status-badge');
+                badge.textContent = data.status_display;
+                badge.className = `status-badge status-${data.status}`;
+            })
+            .catch(error => console.error('Error:', error));
+    });
+}
+
+// Refresh status every 30 seconds
+setInterval(refreshReportStatus, 30000);
+// Chart.js: Recent Tsunami Activity Chart
+document.addEventListener('DOMContentLoaded', function() {
+    var ctx = document.getElementById('tsunami-activity32-chart').getContext('2d');
+    var seismicChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Sep 01', 'Sep 03', 'Sep 05', 'Sep 07', 'Sep 09', 'Sep 11', 'Sep 13'],
+            datasets: [{
+                label: 'Tsunami Events',
+                data: [0, 1, 0, 2, 1, 0, 1],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.7)',
+                    'rgba(255, 159, 64, 0.7)',
+                    'rgba(255, 205, 86, 0.7)',
+                    'rgba(75, 192, 192, 0.7)',
+                    'rgba(54, 162, 235, 0.7)',
+                    'rgba(153, 102, 255, 0.7)',
+                    'rgba(201, 203, 207, 0.7)'
+                ],
+                borderColor: 'rgba(255,99,132,1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                title: {
+                    display: true,
+                    text: 'Recent Tsunami Activity (Events per Day)'
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Date'
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Number of Events'
+                    },
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+});

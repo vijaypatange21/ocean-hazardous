@@ -1,6 +1,12 @@
-venv
-*migrations*
-*__pycache__*
-*db.sqlite3*
-media
-*.env*
+# Virtual environment
+venv/
+
+# Django stuff
+db.sqlite3
+*.pyc
+__pycache__/
+migrations/
+
+# Media & env files
+media/
+.env

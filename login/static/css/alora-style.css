@@ -1,3 +1,116 @@
+i/* Alora-Style CSS for CoastSense */
+/* Glass Morphism and Modern UI Components */
+
+/* Base Glass Morphism Styles */
+.glass-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.glass-button {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    color: white;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.glass-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Gradient Backgrounds */
+.gradient-bg {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.hero-gradient {
+    background: linear-gradient(135deg, #4a90e2, #87ceeb, #5dade2, #aed6f1, #6bb6ff);
+}
+
+/* Metallic Text Effects */
+.hero-title-metallic {
+    font-size: 3rem;
+    font-weight: 900;
+    font-family: Montserrat, sans-serif;
+    background: linear-gradient(135deg, #4a90e2, #87ceeb, #5dade2, #aed6f1, #6bb6ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-align: center;
+    margin: 0;
+    padding: 2rem 0;
+    letter-spacing: 4px;
+    text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    line-height: 1.2;
+}
+
+/* Navigation Styles */
+.horizontal-nav {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 1rem 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-link {
+    color: white;
+    text-decoration: none;
+    margin: 0 1rem;
+    transition: color 0.3s ease;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+.nav-link:hover {
+    color: #1dcdfe;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .nav-container {
+        padding: 0 1rem;
+    }
+
+    .hero-title-metallic {
+        font-size: 2rem;
+        letter-spacing: 2px;
+    }
+}
+
+/* Utility Classes */
+.text-glow {
+    text-shadow: 0 0 10px rgba(255,255,255,0.5);
+}
+
+.blur-bg {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
 /* CoastSense - Alora Inspired Design */
 html {
   -webkit-text-size-adjust: 100%;
@@ -1125,11 +1238,13 @@ body {
 }
 
 .transition-video {
-  width: 150%;
-  height: 150%;
+  width: 100vw;
+  height: 100vh;
   object-fit: cover;
   transform: scale(1.8);
+  transform-origin: center;
 }
+
 
 /* Animation Classes */
 .letter {

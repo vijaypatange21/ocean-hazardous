@@ -1,0 +1,399 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - CoastSense</title>
+    <link href="{% static 'css/alora-style.css' %}" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        .contact-hero {
+            background: linear-gradient(135deg, rgba(29,205,254,0.1), rgba(52,245,197,0.1));
+            padding: 100px 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .contact-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('{% static 'images/ocean3.png' %}') center/cover;
+            opacity: 0.1;
+            z-index: -1;
+        }
+
+        .contact-section {
+            max-width: 1200px;
+            margin: 4rem auto;
+            padding: 0 2rem;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            margin-top: 3rem;
+        }
+
+        .contact-info {
+            background: rgba(26,42,60,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border: 1px solid rgba(29,205,254,0.3);
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, rgba(29,205,254,0.1), rgba(52,245,197,0.1));
+            border-radius: 15px;
+            border: 1px solid rgba(29,205,254,0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .contact-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .contact-icon {
+            font-size: 2rem;
+            margin-right: 1.5rem;
+            color: #1dcdfe;
+            width: 60px;
+            text-align: center;
+        }
+
+        .contact-details h3 {
+            color: #1dcdfe;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .contact-details p {
+            color: rgba(255,255,255,0.9);
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .contact-form {
+            background: rgba(26,42,60,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border: 1px solid rgba(29,205,254,0.3);
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        .form-group label {
+            display: block;
+            color: #1dcdfe;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid rgba(29,205,254,0.3);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+            background: rgba(15,32,48,0.8);
+            color: white;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #1dcdfe;
+            box-shadow: 0 0 10px rgba(29,205,254,0.2);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #1dcdfe, #34f5c5);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            width: 100%;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(29,205,254,0.3);
+        }
+
+        .office-section {
+            background: linear-gradient(135deg, #1dcdfe 0%, #34f5c5 100%);
+            color: white;
+            padding: 4rem 0;
+            text-align: center;
+            margin: 4rem 0;
+        }
+
+        .office-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .office-item {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .office-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .office-address {
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .office-contact {
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .contact-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .contact-hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .contact-info,
+            .contact-form {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body class="body" style="position: relative; min-height: 100vh; overflow-x: hidden;">
+    <video autoplay="" loop="" muted="" playsinline="" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2;">
+        <source src="{% static 'media/waves.mp4' %}">
+    </video>
+    <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(20,30,40,0.85), rgba(30,45,55,0.85)); z-index: -1;"></div>
+
+    <!-- Navigation -->
+    <nav class="horizontal-nav">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="{% static 'images/coastsense-logo.svg' %}" alt="CoastSense" width="120">
+            </div>
+            <div class="nav-links">
+                <a href="{% url 'home' %}" class="nav-link">Home</a>
+                <a href="{% url 'menu' %}" class="menu-toggle">
+                    <div class="hamburger">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="contact-hero" style="position: relative; z-index: 1;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
+            <h1 style="font-size: 3.5rem; font-weight: 700; margin-bottom: 1rem; color: #1dcdfe; text-shadow: 0 4px 20px rgba(29,205,254,0.6), 0 0 40px rgba(29,205,254,0.4);">Contact Us</h1>
+            <p style="font-size: 1.3rem; color: rgba(255,255,255,0.9); max-width: 600px; margin: 0 auto; line-height: 1.6;">
+                Get in touch with our team for support, partnerships, or inquiries about coastal monitoring
+            </p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div style="position: relative; z-index: 1;">
+        <div class="contact-section">
+            <div class="contact-grid">
+                <!-- Contact Information -->
+                <div class="contact-info">
+                    <h2 style="color: #1dcdfe; font-size: 2rem; margin-bottom: 2rem;">Get In Touch</h2>
+                    
+                    <div class="contact-item">
+                        <div class="contact-icon">📍</div>
+                        <div class="contact-details">
+                            <h3>Address</h3>
+                            <p>Indian National Centre for Ocean Information Services (INCOIS)<br>
+                            Pragathi Nagar (BO), Nizampet (SO)<br>
+                            Hyderabad - 500090, Telangana, India</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <div class="contact-icon">📞</div>
+                        <div class="contact-details">
+                            <h3>Phone</h3>
+                            <p>+91-40-23886047<br>
+                            +91-40-23886001 (Main)</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <div class="contact-icon">📧</div>
+                        <div class="contact-details">
+                            <h3>Email</h3>
+                            <p>coastsense@incois.gov.in<br>
+                            director@incois.gov.in</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <div class="contact-icon">🌐</div>
+                        <div class="contact-details">
+                            <h3>Website</h3>
+                            <p><a href="https://incois.gov.in" target="_blank" style="color: #1dcdfe; text-decoration: none;">www.incois.gov.in</a></p>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <div class="contact-icon">🚨</div>
+                        <div class="contact-details">
+                            <h3>Emergency Hotline</h3>
+                            <p>24/7 Coastal Emergency Response<br>
+                            +91-40-23886000</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Form -->
+                <div class="contact-form">
+                    <h2 style="color: #1dcdfe; font-size: 2rem; margin-bottom: 2rem;">Send us a Message</h2>
+                    
+                    <form method="post" action="#">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="name">Full Name *</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email Address *</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" name="phone">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="organization">Organization</label>
+                            <input type="text" id="organization" name="organization">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="subject">Subject *</label>
+                            <input type="text" id="subject" name="subject" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="message">Message *</label>
+                            <textarea id="message" name="message" required placeholder="Please describe your inquiry or how we can help you..."></textarea>
+                        </div>
+
+                        <button type="submit" class="submit-btn">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Office Locations -->
+        <section class="office-section">
+            <h2 style="margin-bottom: 3rem; font-size: 2.5rem;">Our Locations</h2>
+            <div class="office-grid">
+                <div class="office-item">
+                    <div class="office-title">INCOIS Headquarters</div>
+                    <div class="office-address">
+                        Pragathi Nagar (BO), Nizampet (SO)<br>
+                        Hyderabad - 500090<br>
+                        Telangana, India
+                    </div>
+                    <div class="office-contact">
+                        Phone: +91-40-23886047<br>
+                        Email: director@incois.gov.in
+                    </div>
+                </div>
+
+                <div class="office-item">
+                    <div class="office-title">Regional Centre - Chennai</div>
+                    <div class="office-address">
+                        National Institute of Ocean Technology<br>
+                        Pallikaranai, Chennai - 600100<br>
+                        Tamil Nadu, India
+                    </div>
+                    <div class="office-contact">
+                        Phone: +91-44-66783000<br>
+                        Email: chennai@incois.gov.in
+                    </div>
+                </div>
+
+                <div class="office-item">
+                    <div class="office-title">Coastal Monitoring Station</div>
+                    <div class="office-address">
+                        Visakhapatnam Port<br>
+                        Visakhapatnam - 530035<br>
+                        Andhra Pradesh, India
+                    </div>
+                    <div class="office-contact">
+                        Phone: +91-891-2500000<br>
+                        Email: vizag@incois.gov.in
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer style="background: rgba(0,0,0,0.8); color: white; padding: 3rem 0; text-align: center; position: relative; z-index: 1;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
+            <p style="margin: 0; font-size: 1.1rem;">© 2025 CoastSense Project - Indian National Centre for Ocean Information Services (INCOIS)</p>
+            <p style="margin: 0.5rem 0 0; font-size: 0.9rem; opacity: 0.8;">Ministry of Earth Sciences, Government of India</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="{% static 'js/jquery-3.5.1.min.dc5e7f18c8.js' %}"></script>
+    <script src="{% static 'js/page-transition.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+
+</body>
+</html>

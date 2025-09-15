@@ -2,16 +2,26 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
-from datetime import datetime, timedelta
 import random
+from datetime import datetime, timedelta
+
+# ============================================================================
+# MAIN DASHBOARD VIEWS
+# ============================================================================
+import random
+import math
 
 def dashboard(request):
     """Main dashboard view"""
     return render(request, 'dashboard/index.html')
 
+# ============================================================================
+# API ENDPOINTS - SATELLITE DATA
+# ============================================================================
+
 def get_satellite_data(request):
-    """API endpoint to get satellite data"""
-    # Simulate real-time satellite data
+    """API endpoint to get real-time satellite data"""
+    # Simulate real-time satellite monitoring data
     data = {
         'timestamp': datetime.now().isoformat(),
         'sea_surface_temperature': round(random.uniform(20, 30), 2),
@@ -30,8 +40,12 @@ def get_satellite_data(request):
     }
     return JsonResponse(data)
 
+# ============================================================================
+# API ENDPOINTS - HAZARD MONITORING
+# ============================================================================
+
 def get_ocean_hazards(request):
-    """API endpoint to get ocean hazard alerts"""
+    """API endpoint to get ocean hazard alerts from satellite monitoring"""
     hazards = [
         {
             'id': i,

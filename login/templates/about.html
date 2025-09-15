@@ -1,0 +1,524 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - CoastSense</title>
+    <link href="{% static 'css/alora-style.css' %}" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        .about-hero {
+            background: linear-gradient(135deg, rgba(29,205,254,0.1), rgba(52,245,197,0.1));
+            padding: 100px 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .about-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('{% static 'images/ocean3.png' %}') center/cover;
+            opacity: 0.1;
+            z-index: -1;
+        }
+
+        .about-section {
+            max-width: 1200px;
+            margin: 4rem auto;
+            padding: 0 2rem;
+        }
+
+        .about-content {
+            background: rgba(26,42,60,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 2rem 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border: 1px solid rgba(29,205,254,0.3);
+        }
+
+        .mission-vision {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            margin: 4rem 0;
+        }
+
+        .mission-card, .vision-card {
+            background: rgba(26,42,60,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border: 1px solid rgba(29,205,254,0.3);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mission-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(to bottom, #1dcdfe, #34f5c5);
+        }
+
+        .vision-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(to bottom, #34f5c5, #1dcdfe);
+        }
+
+        .card-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+
+        .card-title {
+            color: #1dcdfe;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-description {
+            color: rgba(255,255,255,0.9);
+            line-height: 1.7;
+            font-size: 1.1rem;
+        }
+
+        .team-section {
+            background: rgba(26,42,60,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            color: white;
+            padding: 4rem 0;
+            text-align: center;
+            margin: 4rem auto;
+            max-width: 1200px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border: 1px solid rgba(29,205,254,0.3);
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .team-member {
+            background: rgba(15,32,48,0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid rgba(29,205,254,0.3);
+            transition: transform 0.3s ease;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .team-member:hover {
+            transform: translateY(-5px);
+        }
+
+        .member-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(29,205,254,0.2);
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            border: 2px solid rgba(29,205,254,0.4);
+        }
+
+        .member-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #1dcdfe;
+        }
+
+        .member-role {
+            font-size: 1rem;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .member-description {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .values-section {
+            max-width: 1200px;
+            margin: 4rem auto;
+            padding: 0 2rem;
+        }
+
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .value-item {
+            background: rgba(26,42,60,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            border: 1px solid rgba(29,205,254,0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .value-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .value-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .value-title {
+            color: #1dcdfe;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .value-description {
+            color: rgba(255,255,255,0.9);
+            line-height: 1.6;
+        }
+
+        .stats-section {
+            background: rgba(26,42,60,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 4rem auto;
+            max-width: 1200px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            text-align: center;
+        }
+
+        .stat-item {
+            padding: 2rem;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #1dcdfe;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .mission-vision {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .about-hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .about-content,
+            .mission-card,
+            .vision-card {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body class="body" style="position: relative; min-height: 100vh; overflow-x: hidden;">
+    <video autoplay="" loop="" muted="" playsinline="" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2;">
+        <source src="{% static 'media/waves.mp4' %}">
+    </video>
+    <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(20,30,40,0.85), rgba(30,45,55,0.85)); z-index: -1;"></div>
+
+    <!-- Navigation -->
+    <nav class="horizontal-nav">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="{% static 'images/coastsense-logo.svg' %}" alt="CoastSense" width="120">
+            </div>
+            <div class="nav-links">
+                <a href="{% url 'home' %}" class="nav-link">Home</a>
+                <a href="{% url 'menu' %}" class="menu-toggle">
+                    <div class="hamburger">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="about-hero" style="position: relative; z-index: 1;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
+            <h1 style="font-size: 3.5rem; font-weight: 700; margin-bottom: 1rem; color: #1dcdfe; text-shadow: 0 4px 20px rgba(29,205,254,0.6), 0 0 40px rgba(29,205,254,0.4);">About CoastSense</h1>
+            <p style="font-size: 1.3rem; color: rgba(255,255,255,0.9); max-width: 600px; margin: 0 auto; line-height: 1.6;">
+                Pioneering the future of coastal safety through innovative ocean monitoring technology
+            </p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div style="position: relative; z-index: 1;">
+        <!-- Introduction -->
+        <div class="about-section">
+            <div class="about-content">
+                <h2 style="color: #1dcdfe; font-size: 2.5rem; margin-bottom: 2rem; text-align: center;">Who We Are</h2>
+                <p style="color: rgba(255,255,255,0.9); font-size: 1.2rem; line-height: 1.8; text-align: center; margin-bottom: 2rem;">
+                    CoastSense is a revolutionary ocean hazard monitoring platform developed by 6 college students from Parul University 
+                    as part of the Smart India Hackathon. Our innovative solution addresses coastal safety challenges through advanced technology, 
+                    real-time monitoring, and early warning systems for the Indian National Centre for Ocean Information Services (INCOIS).
+                </p>
+                <p style="color: rgba(255,255,255,0.9); font-size: 1.1rem; line-height: 1.7;">
+                    Our platform combines cutting-edge satellite technology, artificial intelligence, and community engagement to create a comprehensive 
+                    coastal safety network. We monitor ocean conditions 24/7, analyze patterns, and provide timely alerts to help communities prepare 
+                    for and respond to coastal hazards such as tsunamis, storm surges, high waves, and coastal erosion.
+                </p>
+            </div>
+        </div>
+
+        <!-- Mission and Vision -->
+        <div class="about-section">
+            <div class="mission-vision">
+                <div class="mission-card">
+                    <span class="card-icon">🎯</span>
+                    <h3 class="card-title">Our Mission</h3>
+                    <div class="card-description">
+                        To safeguard coastal communities and marine ecosystems through innovative ocean monitoring technology, 
+                        providing accurate, timely, and actionable information that enables proactive disaster preparedness and response.
+                    </div>
+                </div>
+
+                <div class="vision-card">
+                    <span class="card-icon">🔮</span>
+                    <h3 class="card-title">Our Vision</h3>
+                    <div class="card-description">
+                        To become the world's leading platform for coastal hazard monitoring and early warning, creating resilient 
+                        coastal communities through the power of science, technology, and collaborative action.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Core Values -->
+        <div class="values-section">
+            <h2 style="text-align: center; margin-bottom: 2rem; color: #1dcdfe; font-size: 2.5rem;">Our Core Values</h2>
+            <div class="values-grid">
+                <div class="value-item">
+                    <span class="value-icon">🔬</span>
+                    <h3 class="value-title">Scientific Excellence</h3>
+                    <div class="value-description">
+                        We are committed to the highest standards of scientific research and technological innovation in ocean monitoring.
+                    </div>
+                </div>
+
+                <div class="value-item">
+                    <span class="value-icon">🤝</span>
+                    <h3 class="value-title">Community Partnership</h3>
+                    <div class="value-description">
+                        We believe in empowering communities through knowledge sharing and collaborative coastal safety initiatives.
+                    </div>
+                </div>
+
+                <div class="value-item">
+                    <span class="value-icon">⚡</span>
+                    <h3 class="value-title">Rapid Response</h3>
+                    <div class="value-description">
+                        We prioritize speed and accuracy in hazard detection and alert dissemination to maximize safety outcomes.
+                    </div>
+                </div>
+
+                <div class="value-item">
+                    <span class="value-icon">🌱</span>
+                    <h3 class="value-title">Sustainability</h3>
+                    <div class="value-description">
+                        We are dedicated to protecting marine environments and promoting sustainable coastal development practices.
+                    </div>
+                </div>
+
+                <div class="value-item">
+                    <span class="value-icon">🔓</span>
+                    <h3 class="value-title">Open Access</h3>
+                    <div class="value-description">
+                        We believe in making critical safety information accessible to all coastal communities and stakeholders.
+                    </div>
+                </div>
+
+                <div class="value-item">
+                    <span class="value-icon">🎯</span>
+                    <h3 class="value-title">Precision</h3>
+                    <div class="value-description">
+                        We strive for accuracy and reliability in all our monitoring systems and predictive capabilities.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Project Statistics -->
+        <div class="stats-section">
+            <h2 style="text-align: center; margin-bottom: 3rem; color: #1dcdfe;">Project Achievements</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">6</div>
+                    <div class="stat-label">Team Members</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">2024</div>
+                    <div class="stat-label">Smart India Hackathon</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Real-time Monitoring</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Open Source Solution</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Team Section -->
+        <section class="team-section">
+            <h2 style="margin-bottom: 1rem; font-size: 2.5rem;">Team Dispecables</h2>
+            <p style="margin-bottom: 3rem; font-size: 1.2rem; opacity: 0.9;">BTech CSE Students from Parul University - Smart India Hackathon 2024</p>
+            <div class="team-grid">
+                <div class="team-member">
+                    <div class="member-avatar">⚙️</div>
+                    <div class="member-name">Kashish Shrivastav</div>
+                    <div class="member-role">Backend Developer</div>
+                    <div class="member-description">
+                        Developed server-side architecture, database systems, and API integrations for the platform.
+                    </div>
+                </div>
+
+                <div class="team-member">
+                    <div class="member-avatar">🔧</div>
+                    <div class="member-name">Vikas Pandey</div>
+                    <div class="member-role">Backend Developer</div>
+                    <div class="member-description">
+                        Built core backend functionality, authentication systems, and data processing modules.
+                    </div>
+                </div>
+
+                <div class="team-member">
+                    <div class="member-avatar">🎨</div>
+                    <div class="member-name">Krishan Yadav</div>
+                    <div class="member-role">Frontend Developer</div>
+                    <div class="member-description">
+                        Designed and developed the website UI and interactive heat map visualization components.
+                    </div>
+                </div>
+
+                <div class="team-member">
+                    <div class="member-avatar">🎨</div>
+                    <div class="member-name">Vijay Patange</div>
+                    <div class="member-role">UI Designer & Backend Integration</div>
+                    <div class="member-description">
+                        Designed UI for data analytics dashboard and handled backend integration of data analytics models.
+                    </div>
+                </div>
+
+                <div class="team-member">
+                    <div class="member-avatar">📈</div>
+                    <div class="member-name">Aditi Sah</div>
+                    <div class="member-role">Data Analyst</div>
+                    <div class="member-description">
+                        Analyzed coastal data patterns and developed algorithms for hazard detection and prediction.
+                    </div>
+                </div>
+
+                <div class="team-member">
+                    <div class="member-avatar">🔬</div>
+                    <div class="member-name">Sneha Singh</div>
+                    <div class="member-role">Data Analyst</div>
+                    <div class="member-description">
+                        Processed environmental data and contributed to machine learning models for coastal monitoring.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Project Information -->
+        <div class="about-section">
+            <div class="about-content">
+                <h2 style="color: #1dcdfe; font-size: 2.5rem; margin-bottom: 2rem; text-align: center;">Smart India Hackathon Project</h2>
+                <p style="color: rgba(255,255,255,0.9); font-size: 1.1rem; line-height: 1.7; margin-bottom: 1.5rem;">
+                    CoastSense was developed as part of the Smart India Hackathon, a nationwide initiative to harness the creativity and innovation of students 
+                    to solve real-world problems. Our team "Dispecables" from Parul University took on the challenge of creating an advanced coastal monitoring 
+                    system for the Indian National Centre for Ocean Information Services (INCOIS).
+                </p>
+                <p style="color: rgba(255,255,255,0.9); font-size: 1.1rem; line-height: 1.7; margin-bottom: 1.5rem;">
+                    The Indian National Centre for Ocean Information Services (INCOIS) is an autonomous organization under the Ministry of Earth Sciences, 
+                    Government of India. Established in 1999, INCOIS operates the Indian Tsunami Early Warning Centre and provides various ocean-related 
+                    services including potential fishing zone advisories, ocean state forecasts, and high wave alerts.
+                </p>
+                <p style="color: rgba(255,255,255,0.9); font-size: 1.1rem; line-height: 1.7;">
+                    Our solution addresses the critical need for real-time coastal hazard monitoring and community engagement, combining modern web technologies 
+                    with innovative approaches to data visualization and alert systems. CoastSense represents the power of student innovation in solving 
+                    complex environmental challenges.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer style="background: rgba(0,0,0,0.8); color: white; padding: 3rem 0; text-align: center; position: relative; z-index: 1;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
+            <p style="margin: 0; font-size: 1.1rem;">© 2025 CoastSense Project - Team Dispecables, Parul University</p>
+            <p style="margin: 0.5rem 0 0; font-size: 0.9rem; opacity: 0.8;">Smart India Hackathon 2024 - Developed for INCOIS</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="{% static 'js/jquery-3.5.1.min.dc5e7f18c8.js' %}"></script>
+    <script src="{% static 'js/page-transition.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+
+</body>
+</html>

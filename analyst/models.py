@@ -1,22 +1,41 @@
+# ============================================================================
+# analyst/models.py - Analyst application models
+# ============================================================================
+
+# ============================================================================
+# IMPORTS
+# ============================================================================
+
 from django.db import models
-import requests
+from django.contrib.auth.models import User
 from django.utils import timezone
+import requests
 import json
-from datetime import datetime, timedelta
 import logging
+from datetime import datetime, timedelta
 
 logger = logging.getLogger(__name__)
 
+# ============================================================================
+# BUOY MONITORING MODELS
+# ============================================================================
+
 class DartBuoy(models.Model):
+    """Model for DART (Deep-ocean Assessment and Reporting of Tsunamis) buoys"""
+    
     buoy_id = models.CharField(max_length=10, unique=True)
     name = models.CharField(max_length=100, default="Unnamed Buoy")
     latitude = models.FloatField()
     longitude = models.FloatField()
     last_report_time = models.DateTimeField(null=True, blank=True)
+    
+    # Sensor data fields
     wave_height = models.FloatField(null=True, blank=True)  # in meters
     water_temperature = models.FloatField(null=True, blank=True)  # in celsius
     wind_speed = models.FloatField(null=True, blank=True)  # in m/s
     pressure = models.FloatField(null=True, blank=True)  # in hPa
+    
+    # Status and timestamps
     status = models.CharField(max_length=20, default="unknown")  # active / maintenance / offline
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)
@@ -25,9 +44,7 @@ class DartBuoy(models.Model):
         return f"{self.buoy_id} - {self.name}"
 
     def fetch_live_data(self):
-        """
-        Fetch live data from NOAA NDBC for this buoy.
-        """
+        """Fetch live data from NOAA NDBC for this buoy"""
         try:
             # Use NOAA's real-time data API
             url = f"https://www.ndbc.noaa.gov/data/realtime2/{self.buoy_id}.txt"
@@ -70,16 +87,16 @@ class DartBuoy(models.Model):
             self.save()
 
     def get_historical_data(self, hours=24):
-        """
-        Get historical data for charting
-        """
+        """Get historical data for charting"""
         return BuoyReading.objects.filter(
             buoy=self,
             timestamp__gte=timezone.now() - timedelta(hours=hours)
         ).order_by('timestamp')
 
+
 class BuoyReading(models.Model):
-    """Store historical readings for charting"""
+    """Store historical buoy readings for charting and analysis"""
+    
     buoy = models.ForeignKey(DartBuoy, on_delete=models.CASCADE, related_name='readings')
     timestamp = models.DateTimeField()
     wave_height = models.FloatField(null=True, blank=True)
@@ -91,10 +108,68 @@ class BuoyReading(models.Model):
         ordering = ['-timestamp']
         unique_together = ['buoy', 'timestamp']
 
+# ============================================================================
+# REPORT MANAGEMENT MODELS
+# ============================================================================
+
+class Report(models.Model):
+    """Analyst reports submitted to administrators"""
+    
+    STATUS_CHOICES = (
+        ('draft', 'Draft'),
+        ('submitted', 'Submitted'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    )
+    
+    REPORT_TYPES = (
+        ('event', 'Event Analysis Report'),
+        ('risk', 'Risk Assessment Summary'),
+        ('performance', 'Performance Evaluation'),
+        ('compliance', 'Compliance Report'),
+    )
+    
+    # Basic report information
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    report_type = models.CharField(max_length=32, choices=REPORT_TYPES)
+    status = models.CharField(max_length=16, choices=STATUS_CHOICES, default='draft')
+    
+    # User relationships
+    created_by = models.ForeignKey(User, related_name='reports_created', on_delete=models.CASCADE)
+    submitted_to = models.ForeignKey(User, related_name='reports_assigned', blank=True, null=True, on_delete=models.SET_NULL)
+    
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    submitted_at = models.DateTimeField(blank=True, null=True)
+    
+    # File attachment
+    attachment = models.FileField(upload_to='report_attachments/', blank=True, null=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.title} - {self.get_status_display()}"
+
+
+class ReportComment(models.Model):
+    """Comments and feedback on reports from administrators"""
+    
+    report = models.ForeignKey(Report, related_name='comments', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    comment = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+
+# ============================================================================
+# UTILITY FUNCTIONS
+# ============================================================================
+
 def update_india_buoys():
-    """
-    Update Indian Ocean buoys with real NOAA buoy IDs
-    """
+    """Update Indian Ocean buoys with real NOAA buoy IDs"""
     # Real NOAA buoy IDs near Indian Ocean/Indian coastline
     indian_buoys = [
         {"id": "23001", "name": "Arabian Sea", "lat": 17.35, "lon": 68.13},

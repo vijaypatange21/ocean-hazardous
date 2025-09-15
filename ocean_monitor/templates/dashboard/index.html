@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,6 +12,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- Chart.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <!-- Alora Style CSS -->
+    <link href="../static/css/alora-style.css" rel="stylesheet" type="text/css">
     
     <style>
         :root {
@@ -22,14 +25,30 @@
         }
 
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
             min-height: 100vh;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+            background: transparent;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        .navbar {
-            background: var(--ocean-blue) !important;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        /* Custom overrides for ocean monitor */
+        .nav-link:hover {
+            transform: translateY(-4px) scale(1.05) !important;
+            background: rgba(44, 62, 80, 0.9) !important;
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+            backdrop-filter: blur(15px) !important;
+        }
+        
+        .home-btn:hover {
+            transform: translateY(-4px) scale(1.05) !important;
+            background: rgba(44, 62, 80, 0.9) !important;
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+            backdrop-filter: blur(15px) !important;
         }
 
         .navbar-brand {
@@ -38,17 +57,17 @@
         }
 
         .card {
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
-            backdrop-filter: blur(10px);
-            background: rgba(255,255,255,0.95);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+            backdrop-filter: blur(25px);
+            background: linear-gradient(135deg, rgba(26,42,60,0.8), rgba(15,32,48,0.85), rgba(8,24,36,0.9));
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         .card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
         }
 
         .metric-card {
@@ -60,13 +79,16 @@
             font-size: 2.5rem;
             font-weight: bold;
             margin-bottom: 0.5rem;
+            color: #1dcdfe;
+            text-shadow: 0 2px 8px rgba(29,205,254,0.5);
         }
 
         .metric-label {
-            color: #666;
+            color: rgba(255,255,255,0.9);
             font-size: 0.9rem;
             text-transform: uppercase;
             letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.7);
         }
 
         .status-indicator {
@@ -136,14 +158,59 @@
         .hazard-item {
             padding: 15px;
             border-left: 4px solid var(--sea-green);
-            margin-bottom: 10px;
-            background: rgba(255,255,255,0.8);
-            border-radius: 8px;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, rgba(44,62,80,0.8), rgba(52,73,94,0.7));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+            color: white;
+            transition: all 0.3s ease;
         }
 
-        .hazard-high { border-left-color: var(--coral-orange); }
-        .hazard-medium { border-left-color: #ffc107; }
-        .hazard-low { border-left-color: var(--sea-green); }
+        .hazard-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            background: linear-gradient(135deg, rgba(44,62,80,0.9), rgba(52,73,94,0.8));
+        }
+
+        .hazard-high { 
+            border-left-color: #e74c3c; 
+            box-shadow: 0 4px 16px rgba(231,76,60,0.2);
+        }
+        .hazard-medium { 
+            border-left-color: #f39c12; 
+            box-shadow: 0 4px 16px rgba(243,156,18,0.2);
+        }
+        .hazard-low { 
+            border-left-color: #27ae60; 
+            box-shadow: 0 4px 16px rgba(39,174,96,0.2);
+        }
+
+        .hazard-list {
+            max-height: 650px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(29,205,254,0.5) rgba(255,255,255,0.1);
+        }
+
+        .hazard-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .hazard-list::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+        }
+
+        .hazard-list::-webkit-scrollbar-thumb {
+            background: rgba(29,205,254,0.5);
+            border-radius: 3px;
+        }
+
+        .hazard-list::-webkit-scrollbar-thumb:hover {
+            background: rgba(29,205,254,0.7);
+        }
 
         .loading-spinner {
             display: inline-block;
@@ -180,7 +247,7 @@
         }
 
         .chart-container {
-            height: 300px;
+            height: 450px;
             padding: 20px;
         }
 
@@ -218,8 +285,33 @@
     </style>
 </head>
 <body>
+    <!-- Video Background -->
+    <video autoplay="" loop="" muted="" playsinline="" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; z-index: -2;">
+        <source src="{% static 'media/waves.mp4' %}">
+    </video>
+    <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, rgba(26,35,48,0.9), rgba(44,62,80,0.85), rgba(52,73,94,0.9), rgba(34,49,63,0.95)); backdrop-filter: blur(3px); z-index: -1;"></div>
+
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
+    <nav class="horizontal-nav" style="display: flex; align-items: center; min-height: 80px; position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1000; background: linear-gradient(135deg, rgba(26,42,60,0.4), rgba(44,62,80,0.5), rgba(74,144,226,0.15), rgba(135,206,235,0.2), rgba(52,73,94,0.6), rgba(90,154,210,0.25), rgba(174,214,241,0.3), rgba(107,185,255,0.2), rgba(34,49,63,0.45)); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-bottom: 1px solid rgba(255, 255, 255, 0.3); box-shadow: 0 4px 20px rgba(74,144,226,0.2);">
+        <div class="nav-container" style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding: 1rem 2rem; width: 100%;">
+            <div class="nav-logo" style="display: flex; align-items: center;">
+                <img src="{% static 'images/coastsense-logo.svg' %}" alt="CoastSense" width="200" style="vertical-align: middle;">
+            </div>
+            <div class="nav-links" style="display: flex; align-items: center; gap: 1.5rem;">
+                <a href="{% url 'home' %}" class="nav-link home-btn" style="display: flex; align-items: center; background: transparent; backdrop-filter: none; padding: 0.5rem 1.2rem; border-radius: 30px; border: 1px solid transparent; box-shadow: none; color: white; text-decoration: none; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);">
+                    <i class="fas fa-home me-2"></i>HOME
+                </a>
+                <a href="{% url 'admin_dashboard' %}" class="nav-link admin-btn" style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); padding: 0.5rem 1.2rem; border-radius: 30px; border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2); color: white; text-decoration: none; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);">
+                    <i class="fas fa-arrow-left me-2"></i>RETURN TO ADMIN
+                </a>
+            </div>
+        </div>
+    </nav>
+
+
+
+    <!-- Original Navigation (Secondary) -->
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(135deg, rgba(34,49,63,0.6), rgba(44,62,80,0.7), rgba(52,73,94,0.8), rgba(26,42,60,0.65), rgba(74,144,226,0.2), rgba(90,154,210,0.3), rgba(107,185,255,0.25)); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); box-shadow: 0 4px 16px rgba(0,0,0,0.2); border-bottom: 1px solid rgba(255, 255, 255, 0.2); position: fixed; top: 80px; left: 0; right: 0; width: 100%; z-index: 999;">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">
                 <i class="fas fa-water"></i> Ocean Monitor Dashboard
@@ -227,13 +319,13 @@
             <div class="navbar-nav ms-auto">
                 <span class="navbar-text">
                     <i class="fas fa-satellite-dish"></i> INCOIS Real-Time Monitoring
-                    <span class="loading-spinner ms-2" id="globalSpinner"></span>
+                    <span class="loading-spinner ms-2" id="globalSpinner2"></span>
                 </span>
             </div>
         </div>
     </nav>
 
-    <div class="container-fluid mt-4">
+    <div class="container-fluid" style="margin-top: 160px; padding-top: 20px;">
         <!-- Metrics Row -->
         <div class="row mb-4">
             <div class="col-md-3">
@@ -267,8 +359,8 @@
             <!-- Satellite Feed -->
             <div class="col-lg-8">
                 <div class="card mb-4">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0">
+                    <div class="card-header" style="background: rgba(29,205,254,0.15); backdrop-filter: blur(10px); border: 1px solid rgba(29,205,254,0.3); border-radius: 16px 16px 0 0;">
+                        <h5 class="mb-0" style="color: #1dcdfe; font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,0.2);">
                             <i class="fas fa-satellite"></i> Live Satellite Ocean Monitoring
                         </h5>
                     </div>
@@ -341,8 +433,8 @@
 
                 <!-- Temperature Chart -->
                 <div class="card">
-                    <div class="card-header bg-info text-white">
-                        <h6 class="mb-0"><i class="fas fa-chart-line"></i> Sea Surface Temperature Trend</h6>
+                    <div class="card-header" style="background: rgba(29,205,254,0.15); backdrop-filter: blur(10px); border: 1px solid rgba(29,205,254,0.3); border-radius: 16px 16px 0 0;">
+                        <h6 class="mb-0" style="color: #1dcdfe; font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,0.2);"><i class="fas fa-chart-line"></i> Sea Surface Temperature Trend</h6>
                     </div>
                     <div class="card-body">
                         <div class="chart-container">
@@ -356,16 +448,16 @@
             <div class="col-lg-4">
                 <!-- Ocean Status -->
                 <div class="card mb-4">
-                    <div class="card-header bg-success text-white">
-                        <h6 class="mb-0"><i class="fas fa-shield-alt"></i> Ocean Status</h6>
+                    <div class="card-header" style="background: rgba(29,205,254,0.15); backdrop-filter: blur(10px); border: 1px solid rgba(29,205,254,0.3); border-radius: 16px 16px 0 0;">
+                        <h6 class="mb-0" style="color: #1dcdfe; font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,0.2);"><i class="fas fa-shield-alt"></i> Ocean Status</h6>
                     </div>
                     <div class="card-body">
                         <div class="mb-3">
                             <span class="status-indicator status-normal"></span>
-                            <strong>Overall Status: NORMAL</strong>
+                            <strong style="color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.7);">Overall Status: NORMAL</strong>
                         </div>
                         <div class="mb-2">
-                            <small class="text-muted">Last System Check: <span id="systemCheck">--</span></small>
+                            <small style="color: rgba(255,255,255,0.8);">Last System Check: <span id="systemCheck">--</span></small>
                         </div>
                         <div class="progress mb-2">
                             <div class="progress-bar bg-success" role="progressbar" style="width: 85%">
@@ -374,12 +466,12 @@
                         </div>
                         <div class="row text-center">
                             <div class="col">
-                                <div class="h6 mb-0" id="activeAlerts">0</div>
-                                <small class="text-muted">Active Alerts</small>
+                                <div class="h6 mb-0" id="activeAlerts" style="color: #1dcdfe; font-weight: 700;">0</div>
+                                <small style="color: rgba(255,255,255,0.8);">Active Alerts</small>
                             </div>
                             <div class="col">
-                                <div class="h6 mb-0" id="monitoringStations">24</div>
-                                <small class="text-muted">Monitoring Stations</small>
+                                <div class="h6 mb-0" id="monitoringStations" style="color: #1dcdfe; font-weight: 700;">24</div>
+                                <small style="color: rgba(255,255,255,0.8);">Monitoring Stations</small>
                             </div>
                         </div>
                     </div>
@@ -387,15 +479,19 @@
 
                 <!-- Recent Hazard Alerts -->
                 <div class="card">
-                    <div class="card-header bg-warning text-dark">
-                        <h6 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Recent Hazard Alerts</h6>
-                        <small>Auto-refreshing every 30 seconds</small>
+                    <div class="card-header" style="background: linear-gradient(135deg, rgba(44,62,80,0.8), rgba(52,73,94,0.7)); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.15); border-radius: 16px 16px 0 0; box-shadow: 0 4px 20px rgba(0,0,0,0.2);">
+                        <h6 class="mb-0" style="color: #1dcdfe; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.5); display: flex; align-items: center;">
+                            <i class="fas fa-exclamation-triangle me-2" style="color: #f39c12;"></i>Recent Hazard Alerts
+                        </h6>
+                        <small style="color: rgba(255,255,255,0.9); font-weight: 500; text-shadow: 0 1px 2px rgba(0,0,0,0.3);">
+                            <i class="fas fa-sync-alt me-1" style="animation: spin 2s linear infinite;"></i>Auto-refreshing every 30 seconds
+                        </small>
                     </div>
-                    <div class="card-body p-0">
+                    <div class="card-body p-0" style="background: linear-gradient(135deg, rgba(26,42,60,0.9), rgba(15,32,48,0.95)); border-radius: 0 0 16px 16px;">
                         <div class="hazard-list" id="hazardList">
-                            <div class="text-center p-4">
-                                <div class="loading-spinner"></div>
-                                <div class="mt-2">Loading hazard data...</div>
+                            <div class="text-center p-4" style="color: rgba(255,255,255,0.8);">
+                                <div class="loading-spinner" style="border: 3px solid rgba(29,205,254,0.3); border-top: 3px solid #1dcdfe;"></div>
+                                <div class="mt-2" style="font-weight: 500; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">Loading hazard data...</div>
                             </div>
                         </div>
                     </div>
@@ -594,10 +690,10 @@
             
             if (hazards.length === 0) {
                 hazardList.innerHTML = `
-                    <div class="text-center p-4 text-success">
-                        <i class="fas fa-check-circle fa-2x mb-2"></i>
-                        <div>No active hazard alerts</div>
-                        <small class="text-muted">All systems normal</small>
+                    <div class="text-center p-4" style="color: rgba(255,255,255,0.8);">
+                        <i class="fas fa-check-circle fa-2x mb-3" style="color: #27ae60; text-shadow: 0 2px 4px rgba(0,0,0,0.3);"></i>
+                        <div style="font-weight: 600; font-size: 1.1rem; color: #27ae60; text-shadow: 0 1px 2px rgba(0,0,0,0.5); margin-bottom: 0.5rem;">No active hazard alerts</div>
+                        <small style="color: rgba(255,255,255,0.7); font-weight: 500;">All systems normal</small>
                     </div>
                 `;
                 return;
@@ -607,18 +703,23 @@
                 <div class="hazard-item hazard-${hazard.severity}">
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
-                            <h6 class="mb-1">
-                                <i class="fas fa-${getHazardIcon(hazard.type)}"></i>
+                            <h6 class="mb-2" style="color: #1dcdfe; font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">
+                                <i class="fas fa-${getHazardIcon(hazard.type)} me-2" style="color: #f39c12;"></i>
                                 ${formatHazardType(hazard.type)}
                             </h6>
-                            <p class="mb-1 small">${hazard.description}</p>
-                            <small class="text-muted">
-                                <i class="fas fa-map-marker-alt"></i> ${hazard.location}
-                                <br>
-                                <i class="fas fa-clock"></i> ${formatTime(hazard.timestamp)}
-                            </small>
+                            <p class="mb-2 small" style="color: rgba(255,255,255,0.9); line-height: 1.4; text-shadow: 0 1px 2px rgba(0,0,0,0.3);">${hazard.description}</p>
+                            <div style="color: rgba(255,255,255,0.7); font-size: 0.8rem;">
+                                <div class="mb-1">
+                                    <i class="fas fa-map-marker-alt me-1" style="color: #1dcdfe;"></i> 
+                                    <span style="font-weight: 500;">${hazard.location}</span>
+                                </div>
+                                <div>
+                                    <i class="fas fa-clock me-1" style="color: #1dcdfe;"></i> 
+                                    <span>${formatTime(hazard.timestamp)}</span>
+                                </div>
+                            </div>
                         </div>
-                        <span class="badge bg-${getSeverityColor(hazard.severity)}">${hazard.severity.toUpperCase()}</span>
+                        <span class="badge" style="background: linear-gradient(135deg, ${getSeverityGradient(hazard.severity)}); padding: 0.5rem 1rem; border-radius: 20px; font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,0.3); box-shadow: 0 2px 8px rgba(0,0,0,0.2);">${hazard.severity.toUpperCase()}</span>
                     </div>
                 </div>
             `).join('');
@@ -649,6 +750,16 @@
                 'critical': 'dark'
             };
             return colors[severity] || 'secondary';
+        }
+
+        function getSeverityGradient(severity) {
+            const gradients = {
+                'low': '#27ae60, #2ecc71',
+                'medium': '#f39c12, #e67e22',
+                'high': '#e74c3c, #c0392b',
+                'critical': '#8e44ad, #9b59b6'
+            };
+            return gradients[severity] || '#6c757d, #5a6268';
         }
 
         function formatTime(timestamp) {
@@ -682,6 +793,8 @@
                 event.target.style.transform = '';
             }, 600);
         }
+
+
 
         // Auto-refresh functionality
         function startAutoRefresh() {

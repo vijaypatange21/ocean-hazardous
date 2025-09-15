@@ -1,0 +1,105 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Extracted Hazard Info</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-900">
+
+  <div class="max-w-6xl mx-auto py-8">
+    <h1 class="text-3xl font-bold text-center mb-8 text-blue-700">
+      Extracted Hazard Information
+    </h1>
+
+    {% if extracted_infos %}
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for info in extracted_infos %}
+          <div class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition p-6">
+            
+            <!-- Hazard Type & Intensity -->
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-sm font-semibold text-white bg-blue-600 rounded-full px-3 py-1">
+                {{ info.get_hazard_type_display }}
+              </span>
+              <span class="text-xs font-semibold bg-red-100 text-red-600 px-2 py-1 rounded-lg">
+                Intensity: {{ info.intensity }}/10
+              </span>
+            </div>
+
+            <!-- Hazard Description -->
+            <p class="text-gray-700 text-sm mb-4 line-clamp-3">
+              {{ info.hazard_description|truncatewords:25 }}
+            </p>
+
+            <!-- Key details -->
+            <div class="space-y-2">
+              <p class="text-sm"><strong class="text-gray-800">Life Loss:</strong> {{ info.life_loss }}</p>
+              <p class="text-sm"><strong class="text-gray-800">Infra Loss:</strong> {{ info.infra_lost|truncatewords:15 }}</p>
+              <p class="text-sm"><strong class="text-gray-800">Emotions:</strong> {{ info.emotions }}</p>
+            </div>
+
+            <!-- Keywords -->
+            <div class="mt-4">
+              <h4 class="text-sm font-semibold text-gray-600 mb-2">Keywords:</h4>
+              <div class="flex flex-wrap gap-2">
+                {% for keyword in info.keyword_list %}
+                <span class="bg-gray-200 text-gray-800 text-xs px-2 py-1 rounded-full">
+                    {{ keyword }}
+                </span>
+                {% empty %}
+                <span class="text-gray-500 text-sm">No keywords available</span>
+                {% endfor %}
+              </div>
+            </div>
+
+            <!-- Related Posts -->
+            <div class="mt-4">
+              <h4 class="text-sm font-semibold text-gray-600 mb-2">Related Posts:</h4>
+              <ul class="list-disc ml-5 text-sm text-blue-600">
+                {% for post in info.related_posts.all %}
+                  <li>
+                    <a href="{{ post.url }}" target="_blank" class="hover:underline">
+                      {{ post.title|truncatewords:8 }}
+                    </a>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+
+            <!-- Created At -->
+            <p class="mt-4 text-xs text-gray-500">
+              Extracted on: {{ info.created_at|date:"M d, Y H:i" }}
+            </p>
+          </div>
+        {% endfor %}
+      </div>
+
+      <!-- Pagination -->
+      <div class="mt-8 flex justify-center">
+        {% if is_paginated %}
+          <div class="flex space-x-2">
+            {% if page_obj.has_previous %}
+              <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">Prev</a>
+            {% endif %}
+
+            <span class="px-3 py-1 bg-blue-600 text-white rounded">
+              Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+
+            {% if page_obj.has_next %}
+              <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">Next</a>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+
+    {% else %}
+      <p class="text-center text-gray-600">No extracted information found.</p>
+    {% endif %}
+  </div>
+
+</body>
+</html>
